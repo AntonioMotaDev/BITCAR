@@ -1,0 +1,54 @@
+:root {
+    --color-primary: #1a73e8;
+    --color-primary-dark: #1558b0;
+    --color-secondary: #fbbc05;
+    --color-accent: #34a853;
+    --color-background: #f5f6fa;
+    --color-surface: #ffffff;
+    --color-text: #222222;
+    --color-text-light: #757575;
+    --color-border: #e0e0e0;
+    --color-error: #ea4335;
+    --color-success: #34a853;
+    --color-warning: #fbbc05;
+
+    /* COLORES GRUPO ALTIVUS */
+    --color-light-blue: #6B99C5;
+    --color-median-blue: #4A85B8;
+    --color-dark-blue: #2C346C;
+    --color-light-green: #B4CA68;
+    --color-median-green: #AEC44C;
+    --color-dark-green: #1B8946;
+    --color-terracota: #DA6829;
+    --color-pink: #CB2864;
+    --color-dark-gray: #333333;
+
+    /* Sombras */
+    --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.12);
+    --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.16);
+    --shadow-dark: 0 10px 20px rgba(0, 0, 0, 0.19);
+
+    /* Transiciones */
+    --transition-fast: all 0.2s ease-in-out;
+    --transition-medium: all 0.4s ease-in-out;
+    --transition-slow: all 0.6s ease-in-out;
+
+    /* Texto */
+    --font-family-base: 'Montserrat', sans-serif;
+    --text-light-blue: #6B99C5;
+    --text-median-blue: #4A85B8;
+    --text-dark-blue: #2C346C;
+    --text-light-green: #B4CA68;
+    --text-median-green: #AEC44C;
+    --text-dark-green: #1B8946;
+    --text-terracota: #DA6829;
+    --text-pink: #CB2864;
+}
+
+body {
+    font-family: var(--font-family-base);
+    background-color: var(--color-background);
+    color: var(--color-text);
+    margin: 0;
+    padding: 0;
+}
