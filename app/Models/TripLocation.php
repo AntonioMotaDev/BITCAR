@@ -2,14 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TripLocation extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'trip_id',
         'latitude',
@@ -19,16 +16,14 @@ class TripLocation extends Model
         'recorded_at',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'latitude' => 'decimal:7',
-            'longitude' => 'decimal:7',
-            'accuracy' => 'float',
-            'speed' => 'float',
-            'recorded_at' => 'datetime',
-        ];
-    }
+    protected $casts = [
+        'trip_id' => 'integer',
+        'latitude' => 'decimal:8',
+        'longitude' => 'decimal:8',
+        'accuracy' => 'decimal:2',
+        'speed' => 'decimal:2',
+        'recorded_at' => 'datetime',
+    ];
 
     // Relaciones
     public function trip(): BelongsTo

@@ -11,16 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('incidents', function (Blueprint $table) {
+        Schema::create('vehicle_log_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('vehicle_log_id')->constrained('vehicle_logs')->onDelete('cascade');
-            $table->text('description');
-            $table->enum('severity', ['low', 'medium', 'high'])->default('low');
-            $table->boolean('is_resolved')->default(false);
+            $table->foreignId('checklist_item_id')->constrained('checklist_items')->onDelete('restrict');
+            $table->boolean('boolean_answer')->nullable();
+            $table->text('text_answer')->nullable();
+            $table->decimal('numeric_answer', 10, 2)->nullable();
             $table->timestamps();
-
-            $table->index(['vehicle_log_id', 'is_resolved']);
-            $table->index('severity');
         });
     }
 
@@ -29,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('incidents');
+        Schema::dropIfExists('vehicle_log_items');
     }
 };

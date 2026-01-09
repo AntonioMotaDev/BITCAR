@@ -14,12 +14,16 @@ class StoreVehicleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'code' => ['required', 'string', 'max:255', 'unique:vehicles,code'],
-            'plate' => ['required', 'string', 'max:255', 'unique:vehicles,plate'],
-            'brand' => ['required', 'string', 'max:255'],
-            'model' => ['required', 'string', 'max:255'],
+            'brand' => ['required', 'string', 'max:100'],
+            'model' => ['required', 'string', 'max:100'],
             'year' => ['required', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
-            'status' => ['sometimes', 'in:active,inactive,maintenance'],
+            'license_plate' => ['required', 'string', 'max:20', 'unique:vehicles,license_plate'],
+            'vin' => ['nullable', 'string', 'max:50', 'unique:vehicles,vin'],
+            'color' => ['required', 'string', 'max:50'],
+            'type' => ['required', 'in:pickup,sedan,suv,van,camion'],
+            'mileage' => ['required', 'numeric', 'min:0'],
+            'fuel_capacity' => ['required', 'numeric', 'min:0'],
+            'status' => ['sometimes', 'in:activo,mantenimiento,inactivo'],
         ];
     }
 }

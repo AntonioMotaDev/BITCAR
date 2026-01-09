@@ -11,13 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('vehicle_log_photos', function (Blueprint $table) {
+        Schema::create('incidents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('vehicle_log_id')->constrained('vehicle_logs')->onDelete('cascade');
-            $table->string('file_path');
+            $table->text('description');
+            $table->enum('severity', ['baja', 'media', 'alta', 'critica'])->default('media');
+            $table->boolean('is_resolved')->default(false);
+            $table->text('resolution_notes')->nullable();
             $table->timestamps();
-
-            $table->index('vehicle_log_id');
+            
+            // Índices
+            $table->index('severity');
+            $table->index('is_resolved');
         });
     }
 
@@ -26,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('vehicle_log_photos');
+        Schema::dropIfExists('incidents');
     }
 };

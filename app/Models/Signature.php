@@ -2,17 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Signature extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'vehicle_log_id',
-        'path',
+        'signature_data',
+        'signer_name',
+        'signed_at',
+    ];
+
+    protected $casts = [
+        'vehicle_log_id' => 'integer',
+        'signed_at' => 'datetime',
     ];
 
     // Relaciones

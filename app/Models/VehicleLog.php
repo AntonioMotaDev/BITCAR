@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,25 +9,23 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class VehicleLog extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'vehicle_id',
         'user_id',
         'checklist_id',
         'type',
-        'odometer',
+        'mileage',
         'fuel_level',
         'notes',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'odometer' => 'integer',
-            'fuel_level' => 'decimal:2',
-        ];
-    }
+    protected $casts = [
+        'vehicle_id' => 'integer',
+        'user_id' => 'integer',
+        'checklist_id' => 'integer',
+        'mileage' => 'decimal:2',
+        'fuel_level' => 'decimal:2',
+    ];
 
     // Relaciones
     public function vehicle(): BelongsTo
@@ -46,12 +43,12 @@ class VehicleLog extends Model
         return $this->belongsTo(Checklist::class);
     }
 
-    public function items(): HasMany
+    public function vehicleLogItems(): HasMany
     {
         return $this->hasMany(VehicleLogItem::class);
     }
 
-    public function photos(): HasMany
+    public function vehicleLogPhotos(): HasMany
     {
         return $this->hasMany(VehicleLogPhoto::class);
     }
@@ -64,15 +61,5 @@ class VehicleLog extends Model
     public function incidents(): HasMany
     {
         return $this->hasMany(Incident::class);
-    }
-
-    public function startTrip(): HasOne
-    {
-        return $this->hasOne(Trip::class, 'start_vehicle_log_id');
-    }
-
-    public function endTrip(): HasOne
-    {
-        return $this->hasOne(Trip::class, 'end_vehicle_log_id');
     }
 }

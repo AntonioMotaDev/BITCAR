@@ -11,11 +11,15 @@ class VehicleResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'code' => $this->code,
-            'plate' => $this->plate,
             'brand' => $this->brand,
             'model' => $this->model,
             'year' => $this->year,
+            'license_plate' => $this->license_plate,
+            'vin' => $this->vin,
+            'color' => $this->color,
+            'type' => $this->type,
+            'mileage' => $this->mileage,
+            'fuel_capacity' => $this->fuel_capacity,
             'status' => $this->status,
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),

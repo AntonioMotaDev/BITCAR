@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('checklists', function (Blueprint $table) {
+        Schema::create('signatures', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('version')->default('1.0');
-            $table->boolean('is_active')->default(true);
+            $table->foreignId('vehicle_log_id')->unique()->constrained('vehicle_logs')->onDelete('cascade');
+            $table->longText('signature_data');
+            $table->string('signer_name', 255);
+            $table->datetime('signed_at');
             $table->timestamps();
-
-            $table->index('is_active');
         });
     }
 
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('checklists');
+        Schema::dropIfExists('signatures');
     }
 };

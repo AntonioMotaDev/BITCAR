@@ -2,14 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class VehicleAssignment extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'vehicle_id',
         'user_id',
@@ -18,14 +15,13 @@ class VehicleAssignment extends Model
         'is_active',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'start_date' => 'date',
-            'end_date' => 'date',
-            'is_active' => 'boolean',
-        ];
-    }
+    protected $casts = [
+        'vehicle_id' => 'integer',
+        'user_id' => 'integer',
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
+        'is_active' => 'boolean',
+    ];
 
     // Relaciones
     public function vehicle(): BelongsTo

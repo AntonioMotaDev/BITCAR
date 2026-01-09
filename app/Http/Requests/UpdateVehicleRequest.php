@@ -16,12 +16,16 @@ class UpdateVehicleRequest extends FormRequest
         $vehicleId = $this->route('vehicle');
         
         return [
-            'code' => ['sometimes', 'string', 'max:255', 'unique:vehicles,code,' . $vehicleId],
-            'plate' => ['sometimes', 'string', 'max:255', 'unique:vehicles,plate,' . $vehicleId],
-            'brand' => ['sometimes', 'string', 'max:255'],
-            'model' => ['sometimes', 'string', 'max:255'],
+            'brand' => ['sometimes', 'string', 'max:100'],
+            'model' => ['sometimes', 'string', 'max:100'],
             'year' => ['sometimes', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
-            'status' => ['sometimes', 'in:active,inactive,maintenance'],
+            'license_plate' => ['sometimes', 'string', 'max:20', 'unique:vehicles,license_plate,' . $vehicleId],
+            'vin' => ['nullable', 'string', 'max:50', 'unique:vehicles,vin,' . $vehicleId],
+            'color' => ['sometimes', 'string', 'max:50'],
+            'type' => ['sometimes', 'in:pickup,sedan,suv,van,camion'],
+            'mileage' => ['sometimes', 'numeric', 'min:0'],
+            'fuel_capacity' => ['sometimes', 'numeric', 'min:0'],
+            'status' => ['sometimes', 'in:activo,mantenimiento,inactivo'],
         ];
     }
 }

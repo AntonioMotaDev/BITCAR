@@ -14,13 +14,14 @@ return new class extends Migration
         Schema::create('trip_locations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('trip_id')->constrained('trips')->onDelete('cascade');
-            $table->decimal('latitude', 10, 7);
-            $table->decimal('longitude', 10, 7);
-            $table->float('accuracy');
-            $table->float('speed')->nullable();
-            $table->timestamp('recorded_at');
+            $table->decimal('latitude', 10, 8);
+            $table->decimal('longitude', 11, 8);
+            $table->decimal('accuracy', 10, 2)->nullable();
+            $table->decimal('speed', 10, 2)->nullable();
+            $table->datetime('recorded_at');
             $table->timestamps();
-
+            
+            // Índices
             $table->index(['trip_id', 'recorded_at']);
         });
     }

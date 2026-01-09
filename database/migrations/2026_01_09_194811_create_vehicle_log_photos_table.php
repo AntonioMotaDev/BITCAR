@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('signatures', function (Blueprint $table) {
+        Schema::create('vehicle_log_photos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('vehicle_log_id')->constrained('vehicle_logs')->onDelete('cascade');
-            $table->string('path');
+            $table->string('file_path', 255);
+            $table->text('description')->nullable();
             $table->timestamps();
-
-            $table->index('vehicle_log_id');
         });
     }
 
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('signatures');
+        Schema::dropIfExists('vehicle_log_photos');
     }
 };

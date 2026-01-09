@@ -13,14 +13,15 @@ return new class extends Migration
     {
         Schema::create('checklist_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('checklist_id')->constrained('checklists')->onDelete('cascade');
-            $table->string('label');
-            $table->text('answer')->nullable();
-            $table->enum('type', ['boolean', 'text', 'number', 'photo']);
+            $table->foreignId('checklist_id')->constrained('checklists')->onDelete('restrict');
+            $table->string('label', 255);
+            $table->text('description')->nullable();
+            $table->enum('type', ['boolean', 'text', 'number', 'photo', 'signature']);
+            $table->integer('order');
             $table->boolean('required')->default(false);
-            $table->integer('order')->default(0);
             $table->timestamps();
-
+            
+            // Índices
             $table->index(['checklist_id', 'order']);
         });
     }

@@ -15,9 +15,9 @@ class DashboardController extends Controller
     {
         $stats = [
             'total_vehicles' => Vehicle::count(),
-            'active_vehicles' => Vehicle::where('status', 'active')->count(),
+            'active_vehicles' => Vehicle::where('status', 'activo')->count(),
             'total_operators' => User::where('role', 'operador')->count(),
-            'active_trips' => Trip::whereNull('ended_at')->count(),
+            'active_trips' => Trip::whereNull('end_time')->count(),
             'today_logs' => VehicleLog::whereDate('created_at', today())->count(),
         ];
 
@@ -27,7 +27,7 @@ class DashboardController extends Controller
             ->get();
 
         $activeTrips = Trip::with(['vehicle', 'user'])
-            ->whereNull('ended_at')
+            ->whereNull('end_time')
             ->latest()
             ->limit(10)
             ->get();

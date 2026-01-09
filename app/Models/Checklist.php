@@ -2,29 +2,23 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Checklist extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'name',
-        'version',
+        'description',
         'is_active',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'is_active' => 'boolean',
-        ];
-    }
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
 
     // Relaciones
-    public function items(): HasMany
+    public function checklistItems(): HasMany
     {
         return $this->hasMany(ChecklistItem::class)->orderBy('order');
     }

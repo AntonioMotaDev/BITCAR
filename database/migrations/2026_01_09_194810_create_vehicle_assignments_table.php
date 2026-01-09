@@ -13,15 +13,15 @@ return new class extends Migration
     {
         Schema::create('vehicle_assignments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('vehicle_id')->constrained('vehicles')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->date('start_date');
-            $table->date('end_date')->nullable();
+            $table->foreignId('vehicle_id')->constrained('vehicles')->onDelete('restrict');
+            $table->foreignId('user_id')->constrained('users')->onDelete('restrict');
+            $table->datetime('start_date');
+            $table->datetime('end_date')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-
+            
+            // Índices
             $table->index(['vehicle_id', 'is_active']);
-            $table->index(['user_id', 'is_active']);
         });
     }
 

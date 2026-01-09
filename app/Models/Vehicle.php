@@ -2,45 +2,37 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Vehicle extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
-        'code',
-        'plate',
         'brand',
         'model',
         'year',
+        'license_plate',
+        'vin',
+        'color',
+        'type',
+        'mileage',
+        'fuel_capacity',
         'status',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'year' => 'integer',
-        ];
-    }
+    protected $casts = [
+        'year' => 'integer',
+        'mileage' => 'decimal:2',
+        'fuel_capacity' => 'decimal:2',
+    ];
 
     // Relaciones
-    public function assignments(): HasMany
+    public function vehicleAssignments(): HasMany
     {
         return $this->hasMany(VehicleAssignment::class);
     }
 
-    public function activeAssignment(): HasOne
-    {
-        return $this->hasOne(VehicleAssignment::class)
-            ->where('is_active', true)
-            ->latest();
-    }
-
-    public function logs(): HasMany
+    public function vehicleLogs(): HasMany
     {
         return $this->hasMany(VehicleLog::class);
     }
@@ -48,16 +40,5 @@ class Vehicle extends Model
     public function trips(): HasMany
     {
         return $this->hasMany(Trip::class);
-    }
-
-    // Helpers
-    public function isActive(): bool
-    {
-        return $this->status === 'active';
-    }
-
-    public function isInMaintenance(): bool
-    {
-        return $this->status === 'maintenance';
     }
 }

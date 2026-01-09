@@ -2,31 +2,26 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ChecklistItem extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'checklist_id',
         'label',
-        'answer',
+        'description',
         'type',
-        'required',
         'order',
+        'required',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'required' => 'boolean',
-            'order' => 'integer',
-        ];
-    }
+    protected $casts = [
+        'checklist_id' => 'integer',
+        'order' => 'integer',
+        'required' => 'boolean',
+    ];
 
     // Relaciones
     public function checklist(): BelongsTo

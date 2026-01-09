@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('vehicle_log_items', function (Blueprint $table) {
+        Schema::create('checklists', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('vehicle_log_id')->constrained('vehicle_logs')->onDelete('cascade');
-            $table->foreignId('checklist_item_id')->constrained('checklist_items')->onDelete('cascade');
-            $table->text('value');
+            $table->string('name', 255);
+            $table->text('description')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
-
-            $table->index('vehicle_log_id');
+            
+            // Índices
+            $table->index('is_active');
         });
     }
 
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('vehicle_log_items');
+        Schema::dropIfExists('checklists');
     }
 };

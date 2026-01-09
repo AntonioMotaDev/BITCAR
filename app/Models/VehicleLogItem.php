@@ -2,18 +2,24 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class VehicleLogItem extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'vehicle_log_id',
         'checklist_item_id',
-        'value',
+        'boolean_answer',
+        'text_answer',
+        'numeric_answer',
+    ];
+
+    protected $casts = [
+        'vehicle_log_id' => 'integer',
+        'checklist_item_id' => 'integer',
+        'boolean_answer' => 'boolean',
+        'numeric_answer' => 'decimal:2',
     ];
 
     // Relaciones

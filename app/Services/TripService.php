@@ -20,8 +20,9 @@ class TripService
         return Trip::create([
             'vehicle_id' => $vehicle->id,
             'user_id' => $user->id,
-            'start_vehicle_log_id' => $startLog->id,
-            'started_at' => now(),
+            'start_time' => now(),
+            'start_mileage' => $startLog->mileage,
+            'start_fuel_level' => $startLog->fuel_level,
         ]);
     }
 
@@ -31,9 +32,10 @@ class TripService
     public function endTrip(Trip $trip, VehicleLog $endLog): Trip
     {
         $trip->update([
-            'end_vehicle_log_id' => $endLog->id,
-            'ended_at' => now(),
-            'total_distance_km' => $this->calculateTotalDistance($trip),
+            'end_time' => now(),
+            'end_mileage' => $endLog->mileage,
+            'end_fuel_level' => $endLog->fuel_level,
+            'distance_km' => $this->calculateTotalDistance($trip),
             'estimated_fuel_consumption' => $this->estimateFuelConsumption($trip, $endLog),
         ]);
 
@@ -116,10 +118,8 @@ class TripService
      */
     private function estimateFuelConsumption(Trip $trip, VehicleLog $endLog): float
     {
-        $startLog = $trip->startLog;
-        
-        $distance = $trip->total_distance_km ?? 0;
-        $fuelDiff = $startLog->fuel_level - $endLog->fuel_level;
+        $distance = $trip->distance_km ?? 0;
+        $fuelDiff = ($trip->start_fuel_level ?? 0) - ($endLog->fuel_level ?? 0);
         
         // Si hay consumo de combustible y distancia, calcular rendimiento
         if ($fuelDiff > 0 && $distance > 0) {
@@ -135,8 +135,8 @@ class TripService
     public function getActiveTrip(User $user): ?Trip
     {
         return Trip::where('user_id', $user->id)
-            ->whereNull('ended_at')
-            ->with(['vehicle', 'startLog'])
+            ->whereNull('end_time')
+            ->with(['vehicle'])
             ->first();
     }
 
@@ -146,7 +146,7 @@ class TripService
     public function hasActiveTrip(Vehicle $vehicle): bool
     {
         return Trip::where('vehicle_id', $vehicle->id)
-            ->whereNull('ended_at')
+            ->whereNull('end_time')
             ->exists();
     }
 }
