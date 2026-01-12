@@ -84,4 +84,105 @@ class TripController extends Controller
             ],
         ]);
     }
+
+    /**
+     * Crear un nuevo viaje
+     */
+    public function store(\Illuminate\Http\Request $request): JsonResponse
+    {
+        $request->validate([
+            'vehicle_id' => 'required|integer|exists:vehicles,id',
+            'start_mileage' => 'required|numeric|min:0',
+            'start_fuel_level' => 'nullable|numeric|between:0,100',
+        ]);
+
+        $user = $request->user();
+
+        // Verificar que el vehículo está asignado al usuario
+        $assignment = \App\Models\VehicleAssignment::where('user_id', $user->id)
+            ->where('vehicle_id', $request->input('vehicle_id'))
+            ->where('is_active', true)
+            ->first();
+
+        if (! $assignment) {
+            return response()->json([
+                'message' => 'El vehículo no está asignado a ti',
+            ], 403);
+        }
+
+        // Verificar que no haya viaje activo en este vehículo
+        $activeTrip = Trip::where('vehicle_id', $request->input('vehicle_id'))
+            ->whereNull('end_time')
+            ->first();
+
+        if ($activeTrip) {
+            return response()->json([
+                'message' => 'Ya existe un viaje activo para este vehículo',
+            ], 422);
+        }
+
+        $trip = Trip::create([
+            'vehicle_id' => $request->input('vehicle_id'),
+            'user_id' => $user->id,
+            'start_time' => now(),
+            'start_mileage' => $request->input('start_mileage'),
+            'start_fuel_level' => $request->input('start_fuel_level'),
+            'is_active' => true,
+        ]);
+
+        return response()->json([
+            'message' => 'Viaje iniciado',
+            'data' => new TripResource($trip),
+        ], 201);
+    }
+
+    /**
+     * Finalizar un viaje
+     */
+    public function endTrip(\Illuminate\Http\Request $request, Trip $trip): JsonResponse
+    {
+        // Verificar que el viaje pertenece al usuario
+        if ($trip->user_id !== $request->user()->id) {
+            return response()->json([
+                'message' => 'No autorizado',
+            ], 403);
+        }
+
+        // Verificar que el viaje está activo
+        if ($trip->end_time) {
+            return response()->json([
+                'message' => 'El viaje ya ha sido finalizado',
+            ], 422);
+        }
+
+        $request->validate([
+            'end_mileage' => 'required|numeric|min:' . $trip->start_mileage,
+            'end_fuel_level' => 'nullable|numeric|between:0,100',
+            'notes' => 'nullable|string',
+        ]);
+
+        // Calcular distancia
+        $distance = $request->input('end_mileage') - $trip->start_mileage;
+
+        // Estimar consumo de combustible
+        $estimatedConsumption = 0;
+        if ($trip->start_fuel_level && $request->input('end_fuel_level')) {
+            $estimatedConsumption = $trip->start_fuel_level - $request->input('end_fuel_level');
+        }
+
+        $trip->update([
+            'end_time' => now(),
+            'end_mileage' => $request->input('end_mileage'),
+            'end_fuel_level' => $request->input('end_fuel_level'),
+            'distance_km' => round($distance, 2),
+            'estimated_fuel_consumption' => round($estimatedConsumption, 2),
+            'notes' => $request->input('notes'),
+            'is_active' => false,
+        ]);
+
+        return response()->json([
+            'message' => 'Viaje finalizado',
+            'data' => new TripResource($trip),
+        ], 200);
+    }
 }

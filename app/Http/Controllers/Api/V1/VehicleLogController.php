@@ -116,4 +116,81 @@ class VehicleLogController extends Controller
             'data' => $incident,
         ], 201);
     }
-}
+
+    /**
+     * Subir fotos a un vehicle log
+     */
+    public function storePhotos(\Illuminate\Http\Request $request, int $logId): JsonResponse
+    {
+        $log = $request->user()->vehicleLogs()->findOrFail($logId);
+
+        if (! $request->hasFile('file')) {
+            return response()->json([
+                'message' => 'No se envió archivo',
+            ], 422);
+        }
+
+        $file = $request->file('file');
+        
+        // Validar que es una imagen
+        if (! in_array($file->getMimeType(), ['image/jpeg', 'image/png', 'image/gif', 'image/webp'])) {
+            return response()->json([
+                'message' => 'El archivo debe ser una imagen válida',
+            ], 422);
+        }
+
+        // Guardar la imagen
+        $path = $file->store('vehicle-logs/' . $log->id, 'public');
+
+        $photo = \App\Models\VehicleLogPhoto::create([
+            'vehicle_log_id' => $log->id,
+            'file_path' => $path,
+            'description' => $request->input('description'),
+        ]);
+
+        return response()->json([
+            'message' => 'Foto guardada exitosamente',
+            'data' => [
+                'id' => $photo->id,
+                'file_path' => $path,
+                'url' => \Illuminate\Support\Facades\Storage::url($path),
+            ],
+        ], 201);
+    }
+
+    /**
+     * Registrar carga de combustible
+     */
+    public function storeFuelLoad(\Illuminate\Http\Request $request, int $logId): JsonResponse
+    {
+        $log = $request->user()->vehicleLogs()->findOrFail($logId);
+
+        $request->validate([
+            'amount_liters' => 'required|numeric|min:0.1',
+            'cost' => 'required|numeric|min:0',
+            'currency' => 'required|string|size:3',
+            'notes' => 'nullable|string',
+        ]);
+
+        $fuelLoad = \App\Models\FuelLoad::create([
+            'vehicle_log_id' => $log->id,
+            'vehicle_id' => $log->vehicle_id,
+            'user_id' => $request->user()->id,
+            'amount_liters' => $request->input('amount_liters'),
+            'cost' => $request->input('cost'),
+            'currency' => $request->input('currency'),
+            'latitude' => $request->input('latitude'),
+            'longitude' => $request->input('longitude'),
+            'notes' => $request->input('notes'),
+        ]);
+
+        return response()->json([
+            'message' => 'Carga de combustible registrada',
+            'data' => [
+                'id' => $fuelLoad->id,
+                'amount_liters' => $fuelLoad->amount_liters,
+                'cost' => $fuelLoad->cost,
+                'created_at' => $fuelLoad->created_at,
+            ],
+        ], 201);
+    }
