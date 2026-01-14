@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreVehicleRequest;
 use App\Http\Requests\UpdateVehicleRequest;
 use App\Models\Vehicle;
+use App\Models\Document;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -17,11 +18,12 @@ class VehicleController extends Controller
     {
         $this->authorize('viewAny', Vehicle::class);
         
-        $vehicles = Vehicle::with('activeAssignment.user')
+        $vehicles = Vehicle::with('vehicleAssignments.user')
             ->latest()
             ->paginate(15);
+        $documents = $documents = Document::all();
 
-        return view('vehicles.index', compact('vehicles'));
+        return view('vehicles.index', compact('vehicles','documents'));
     }
 
     public function create(): View

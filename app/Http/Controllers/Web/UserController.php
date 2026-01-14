@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
+use App\Models\Document;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -18,7 +19,8 @@ class UserController extends Controller
         $this->authorize('viewAny', User::class);
         
         $users = User::latest()->paginate(15);
-        return view('users.index', compact('users'));
+        $documents = Document::all();
+        return view('users.index', compact('users','documents'));
     }
 
     public function create(): View
@@ -27,11 +29,40 @@ class UserController extends Controller
         return view('users.create');
     }
 
-    public function store(StoreUserRequest $request): RedirectResponse
+    /**
+     * Almacenar un nuevo usuario
+     */
+    public function store(Request $request)
     {
-        $this->authorize('create', User::class);
-        User::create($request->validated());
-        return redirect()->route('users.index')->with('success', 'Usuario creado');
+        // Validación
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'role' => 'required|in:admin,supervisor,operador',
+            'status' => 'required|in:active,inactive',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        // Crear usuario
+        $user = new User();
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+        $user->password = Hash::make($validated['password']);
+        $user->role = $validated['role'];
+        $user->status = $validated['status'];
+
+        // Manejar imagen si se subió
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('users', 'public');
+            $user->image = $path;
+        }
+
+        $user->save();
+
+        // Redirigir con mensaje de éxito
+        return redirect()->route('users.index')
+            ->with('success', 'Usuario creado exitosamente.');
     }
 
     public function show(User $user): View

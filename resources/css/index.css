@@ -1,0 +1,116 @@
+/* Estilos CSS para mejorar la apariencia */
+.card-custom {
+    border-radius: 12px;
+}
+        
+.avatar-large {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: #0d6efd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+}
+        
+.avatar-small {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+        
+.document-icon-small {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+        
+.info-label {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+}
+        
+.info-value {
+    font-size: 0.875rem;
+    color: #212529;
+    font-weight: 500;
+    margin-bottom: 0;
+}
+        
+        
+.btn-link-primary {
+    color: #0d6efd;
+}
+        
+.btn-link-primary:hover {
+    color: #0a58ca;
+}
+        
+.document-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+        
+.document-item {
+    padding: 0.75rem;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+        
+.document-item:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+        
+.table thead th {
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+    white-space: nowrap;
+}
+        
+.table tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+        
+/* Ajustes para la nueva columna */
+.table td, .table th {
+    vertical-align: middle;
+}
+        
+/* Ajuste para mejor espaciado de la tabla */
+.table th, .table td {
+    padding: 0.75rem 0.5rem;
+}
+        
+.table th:first-child, .table td:first-child {
+    padding-left: 1rem;
+}
+        
+.table th:last-child, .table td:last-child {
+    padding-right: 1rem;
+}
+
+.vehicle-row {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.vehicle-row:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+}
+        
+.vehicle-row.active {
+    background-color: rgba(13, 110, 253, 0.1);
+    border-left: 4px solid #0d6efd;
+}

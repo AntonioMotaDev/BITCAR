@@ -23,6 +23,7 @@ return new class extends Migration
             $table->decimal('mileage', 10, 2);
             $table->decimal('fuel_capacity', 10, 2);
             $table->enum('status', ['activo', 'mantenimiento', 'inactivo'])->default('activo');
+            $table->string('image')->nullable();
             $table->timestamps();
             
             // Índices

@@ -1,226 +1,554 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-2xl text-neutral-800 leading-tight">
-                Vehículos
+        <div class="d-flex justify-content-between align-items-center">
+            <h2 class="h2 fw-bold text-dark mb-0">
+                GESTIONAR UNIDADES VEHICULARES
             </h2>
-            @if(auth()->user()->isAdmin() || auth()->user()->isSupervisor())
-                <a href="{{ route('vehicles.create') }}" class="inline-flex items-center px-4 py-2 bg-neutral-800 border border-transparent rounded-lg font-medium text-sm text-white hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    Nuevo Vehículo
-                </a>
-            @endif
+            <div>
+                <button class="btn btn-add">
+                    <i class="bi bi-plus-lg"></i> Crear Nueva Unidad
+                </button>
+            </div>
         </div>
     </x-slot>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div class="bg-white rounded-lg border border-neutral-200 p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <svg class="h-10 w-10 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/>
-                        </svg>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-neutral-500">Total</p>
-                        <p class="text-2xl font-semibold text-neutral-900">{{ $vehicles->total() }}</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="bg-white rounded-lg border border-neutral-200 p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <svg class="h-10 w-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-neutral-500">Activos</p>
-                        <p class="text-2xl font-semibold text-green-600">{{ $vehicles->where('status', 'activo')->count() }}</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="bg-white rounded-lg border border-neutral-200 p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <svg class="h-10 w-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                        </svg>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-neutral-500">Mantenimiento</p>
-                        <p class="text-2xl font-semibold text-amber-600">{{ $vehicles->where('status', 'mantenimiento')->count() }}</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="bg-white rounded-lg border border-neutral-200 p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <svg class="h-10 w-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
-                        </svg>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-neutral-500">Inactivos</p>
-                        <p class="text-2xl font-semibold text-red-600">{{ $vehicles->where('status', 'inactivo')->count() }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="container-fluid py-4 px-4">
+        <!-- Contenedor principal con espacio entre columnas -->
+        <div class="row"> 
+            <!-- Información de la unidad -->
+            <div class="col-lg-4"> 
+                <!-- Tarjeta Principal de la Unidad -->
+                <div class="card card-custom border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <!-- Encabezado con avatar -->
+                        <div class="d-flex align-items-start mb-4">
+                            <div class="avatar-large me-4 flex-shrink-0">
+                                <i class="bi bi-car-front fs-1 text-white"></i>
+                            </div>
+                            
+                            <div class="flex-grow-1">
+                                <h1 class="h4 fw-bold text-dark mb-1 vehicle-brand">
+                                    {{ $vehicles->first()->brand ?? 'Seleccione una unidad' }}
+                                </h1>
+                                <p class="h6 text-secondary mb-0 vehicle-model">
+                                    {{ $vehicles->first()->model ?? 'N/A' }}
+                                </p>
+                            </div>
+                        </div>
 
-        <!-- Vehicles Table -->
-        <div class="bg-white rounded-lg border border-neutral-200 overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-neutral-200">
-                    <thead class="bg-neutral-50">
-                        <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                                Vehículo
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                                Placas
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                                Estado
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                                Asignado a
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                                Kilometraje
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                                Acciones
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-neutral-200">
-                        @forelse($vehicles as $vehicle)
-                            <tr class="hover:bg-neutral-50 transition-colors">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-10 w-10 bg-neutral-100 rounded-lg flex items-center justify-center">
-                                            <svg class="h-6 w-6 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/>
-                                            </svg>
-                                        </div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium text-neutral-900">{{ $vehicle->brand }} {{ $vehicle->model }}</div>
-                                            <div class="text-sm text-neutral-500">{{ $vehicle->year }}</div>
-                                        </div>
+                        <!-- Información de la Unidad -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <p class="info-label">Año</p>
+                                        <p class="info-value vehicle-year">{{ $vehicles->first()->year ?? 'N/A' }}</p>
                                     </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-mono font-medium text-neutral-900">{{ $vehicle->license_plate }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @switch($vehicle->status)
-                                        @case('activo')
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                <svg class="w-2 h-2 mr-1" fill="currentColor" viewBox="0 0 8 8">
-                                                    <circle cx="4" cy="4" r="3"/>
-                                                </svg>
-                                                Activo
-                                            </span>
-                                            @break
-                                        @case('mantenimiento')
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
-                                                <svg class="w-2 h-2 mr-1" fill="currentColor" viewBox="0 0 8 8">
-                                                    <circle cx="4" cy="4" r="3"/>
-                                                </svg>
-                                                Mantenimiento
-                                            </span>
-                                            @break
-                                        @case('inactivo')
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                                <svg class="w-2 h-2 mr-1" fill="currentColor" viewBox="0 0 8 8">
-                                                    <circle cx="4" cy="4" r="3"/>
-                                                </svg>
-                                                Inactivo
-                                            </span>
-                                            @break
-                                    @endswitch
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
-                                    @if($vehicle->currentAssignment)
-                                        <div class="flex items-center">
-                                            <svg class="w-4 h-4 mr-1 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                            </svg>
-                                            {{ $vehicle->currentAssignment->user->name }}
-                                        </div>
-                                    @else
-                                        <span class="text-neutral-400">Sin asignar</span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-900">
-                                    {{ number_format($vehicle->mileage) }} km
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <div class="flex justify-end space-x-2">
-                                        <a href="{{ route('vehicles.show', $vehicle) }}" class="text-neutral-600 hover:text-neutral-900" title="Ver detalles">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                            </svg>
-                                        </a>
-                                        @if(auth()->user()->isAdmin() || auth()->user()->isSupervisor())
-                                            <a href="{{ route('vehicles.edit', $vehicle) }}" class="text-neutral-600 hover:text-neutral-900" title="Editar">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                                </svg>
-                                            </a>
-                                            <form action="{{ route('vehicles.destroy', $vehicle) }}" method="POST" class="inline" onsubmit="return confirm('¿Está seguro de eliminar este vehículo?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-900" title="Eliminar">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                                    </svg>
-                                                </button>
-                                            </form>
-                                        @endif
+                                    <div class="col-md-4 mb-3">
+                                        <p class="info-label">Color</p>
+                                        <p class="info-value vehicle-color">{{ $vehicles->first()->color ?? 'N/A' }}</p>
                                     </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="px-6 py-12 text-center">
-                                    <svg class="mx-auto h-12 w-12 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/>
-                                    </svg>
-                                    <h3 class="mt-2 text-sm font-medium text-neutral-900">No hay vehículos</h3>
-                                    <p class="mt-1 text-sm text-neutral-500">Comience agregando un nuevo vehículo.</p>
-                                    @if(auth()->user()->isAdmin() || auth()->user()->isSupervisor())
-                                        <div class="mt-6">
-                                            <a href="{{ route('vehicles.create') }}" class="inline-flex items-center px-4 py-2 bg-neutral-800 border border-transparent rounded-lg font-medium text-sm text-white hover:bg-neutral-700">
-                                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                                </svg>
-                                                Nuevo Vehículo
-                                            </a>
-                                        </div>
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Pagination -->
-            @if($vehicles->hasPages())
-                <div class="px-6 py-4 border-t border-neutral-200">
-                    {{ $vehicles->links() }}
+                                    <div class="col-md-4 mb-3">
+                                        <p class="info-label">Tipo</p>
+                                        <p class="info-value vehicle-type">{{ $vehicles->first()->type ?? 'N/A' }}</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <p class="info-label">Placa</p>
+                                        <p class="info-value vehicle-license_plate">{{ $vehicles->first()->license_plate ?? 'N/A' }}</p>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <p class="info-label">VIN</p>
+                                        <p class="info-value vehicle-vin">{{ $vehicles->first()->vin ?? 'N/A' }}</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <p class="info-label">Kilometraje</p>
+                                        <p class="info-value vehicle-mileage">{{ $vehicles->first()->mileage ?? 'N/A' }}</p>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <p class="info-label">Combustible</p>
+                                        <p class="info-value vehicle-fuel_capacity">{{ $vehicles->first()->fuel_capacity ?? 'N/A' }}</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-12 mb-3">
+                                        <p class="info-label">Estado</p>
+                                        <p class="info-value vehicle-status">{{ $vehicles->first()->status ?? 'N/A' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botón Editar -->
+                        <div class="position-relative" style="min-height: 60px;" >
+                            <button class="btn btn-edit position-absolute bottom-0 end-0 d-flex align-items-center px-4 py-2">
+                                <i class="bi bi-pencil-square me-2"></i>
+                                Editar
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            @endif
+
+                <!-- Tarjeta de Documentos -->
+                <div class="card card-custom border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h3 class="h5 fw-bold text-dark mb-3">Documentos de la Unidad</h3>
+                        <div class="document-list vehicle-documents">
+                            @if($vehicles->first()->documents && $vehicles->first()->documents->count() > 0)
+                                @foreach($vehicles->first()->documents as $document)
+                                <div class="document-item mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="document-icon-small bg-primary bg-opacity-10 me-3">
+                                            <i class="bi bi-file-text-fill text-primary"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <p class="fw-medium text-dark mb-0 small">{{ $document->file_name }}</p>
+                                            <p class="text-muted small mb-0">
+                                                {{ $document->expiration_date ? 'Vence: ' . $document->expiration_date->format('d/m/Y') : 'Sin fecha' }}
+                                            </p>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-download"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                @endforeach
+                            @else
+                                <div class="text-center py-3">
+                                    <i class="bi bi-file-earmark-x fs-1 text-muted"></i>
+                                    <p class="text-muted small mt-2">No hay documentos disponibles</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Usuarios Registrados -->
+            <div class="col-lg-8">
+                <div>
+                    <div class="card-body">
+                        <!-- Barra de búsqueda -->
+                        <div class="row mb-4">
+                            <div class="search-container">
+                                    <div class="input-group search-box  rounded-pill overflow-hidden">
+                                        <span class="input-group-text bg-white border-end-0">
+                                        </span>
+                                        <input type="text" class="form-control border-start-0" placeholder="Buscar usuario..." aria-label="Buscar usuario">
+                                        <button class="btn  bg-white"  type="button">
+                                            <i class="bi bi-search"></i>
+                                        </button>
+                                    </div>
+                            </div>
+                            <div class="col-12 py-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h2 class="h3 fw-bold text-dark mb-0">Usuarios Registrados</h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lista de Usuarios -->
+                        <div class="table-responsive card card-custom">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead>
+                                    <tr class="table-light">
+                                        <th scope="col" class="ps-3">Marca</th>
+                                        <th scope="col">Modelo</th>
+                                        <th scope="col">Tipo</th>
+                                        <th scope="col">Año</th>
+                                        <th scope="col">Placa</th>
+                                        <th scope="col" class="text-end pe-3">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($vehicles as $vehicle)
+                                    <tr class="vehicle-row {{ $loop->first ? 'active' : '' }}"
+                                        data-vehicle-id="{{ $vehicle->id }}"
+                                        data-vehicle-brand="{{ $vehicle->brand }}"
+                                        data-vehicle-model="{{ $vehicle->model }}"
+                                        data-vehicle-color="{{ $vehicle->color }}"
+                                        data-vehicle-type="{{ $vehicle->type }}"
+                                        data-vehicle-year="{{ $vehicle->year }}"
+                                        data-vehicle-mileage="{{ $vehicle->mileage }}"
+                                        data-vehicle-fuel_capacity="{{ $vehicle->fuel_capacity }}"
+                                        data-vehicle-license_plate="{{ $vehicle->license_plate }}"
+                                        data-vehicle-vin="{{ $vehicle->vin }}"
+                                        data-vehicle-status="{{ $vehicle->status }}"
+                                        data-vehicle-documents='@json($vehicle->documents ?? [])'>
+                                        
+                                        <td class="ps-3">
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-small bg-primary bg-opacity-10 me-3">
+                                                    <i class="bi bi-car-front text-primary"></i>
+                                                </div>
+                                                <div>
+                                                    <h3 class="h6 fw-bold text-dark mb-0">{{ $vehicle->brand }}</h3>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>{{ $vehicle->model }}</td>
+                                        <td>{{ $vehicle->type }}</td>
+                                        <td>{{ $vehicle->year }}</td>
+                                        <td>{{ $vehicle->license_plate }}                                  </td>
+                                        <td class="text-end pe-3">
+                                            <div class="d-flex gap-2 justify-content-end">
+                                                <button class="btn btn-eye btn-view-vehicle" 
+                                                        data-vehicle-id="{{ $vehicle->id }}"
+                                                        title="Ver detalles">
+                                                    <i class="bi bi-eye"></i> Ver
+                                                </button>
+                                                <button class="btn btn-edit" 
+                                                        data-vehicle-id="{{ $vehicle->id }}"
+                                                        title="Editar unidad">
+                                                    <i class="bi bi-pencil-square"></i> Editar
+                                                </button>
+                                                <button class="btn btn-delete" 
+                                                        data-vehicle-id="{{ $vehicle->id }}"
+                                                        title="Eliminar unidad">
+                                                    <i class="bi bi-trash"></i> Eliminar
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Paginación -->
+                        <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                            <div class="text-muted small">
+                                Mostrando {{ $vehicles->count() }} de {{ $vehicles->total() ?? 24 }} unidades
+                            </div>
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination pagination-sm mb-0">
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+                                    </li>
+                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#">Siguiente</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Script de gestión de unidades vehiculares cargado');
+            
+            // 1. FUNCIÓN PARA CARGAR INFORMACIÓN DE LA UNIDAD
+            function loadVehicleInfo(vehicleRow) {
+                if (!vehicleRow) {
+                    console.error('La fila de la unidad no existe');
+                    return;
+                }
+                
+                // Obtener datos de los atributos data-*
+                const vehicleId = vehicleRow.getAttribute('data-vehicle-id');
+                const vehicleBrand = vehicleRow.getAttribute('data-vehicle-brand');
+                const vehicleModel = vehicleRow.getAttribute('data-vehicle-model');
+                const vehicleColor = vehicleRow.getAttribute('data-vehicle-color');
+                const vehicleType = vehicleRow.getAttribute('data-vehicle-type');
+                const vehicleYear = vehicleRow.getAttribute('data-vehicle-year');
+                const vehicleMileage = vehicleRow.getAttribute('data-vehicle-mileage');
+                const vehicleFuelCapacity = vehicleRow.getAttribute('data-vehicle-fuel_capacity');
+                const vehicleLicensePlate = vehicleRow.getAttribute('data-vehicle-license_plate');
+                const vehicleVin = vehicleRow.getAttribute('data-vehicle-vin');
+                const vehicleStatus = vehicleRow.getAttribute('data-vehicle-status');
+                
+                console.log('Cargando unidad:', vehicleBrand, vehicleModel);
+                
+                // Actualizar información principal
+                updateElementText('.vehicle-brand', vehicleBrand || 'N/A');
+                updateElementText('.vehicle-model', vehicleModel || 'N/A');
+                updateElementText('.vehicle-color', vehicleColor || 'N/A');
+                updateElementText('.vehicle-type', vehicleType || 'N/A');
+                updateElementText('.vehicle-year', vehicleYear || 'N/A');
+                updateElementText('.vehicle-mileage', vehicleMileage || 'N/A');
+                updateElementText('.vehicle-fuel_capacity', vehicleFuelCapacity || 'N/A');   
+                updateElementText('.vehicle-license_plate', vehicleLicensePlate || 'N/A');
+                updateElementText('.vehicle-vin', vehicleVin || 'N/A');
+                updateElementText('.vehicle-status', vehicleStatus || 'N/A');
+
+                // Actualizar documentos
+                try {
+                    const vehicleDocuments = JSON.parse(vehicleRow.getAttribute('data-vehicle-documents') || '[]');
+                    updateVehicleDocuments(vehicleDocuments);
+                } catch (e) {
+                    console.error('Error al parsear documentos:', e);
+                    updateVehicleDocuments([]);
+                }
+                
+                // Resaltar fila activa
+                highlightActiveRow(vehicleId);
+                
+                // Actualizar URL (opcional)
+                history.pushState(null, '', `?vehicle=${vehicleId}`);
+            }
+            
+            // 2. FUNCIÓN AUXILIAR PARA ACTUALIZAR TEXTO
+            function updateElementText(selector, text) {
+                const element = document.querySelector(selector);
+                if (element) {
+                    element.textContent = text;
+                    return true;
+                } else {
+                    console.warn(`Elemento no encontrado: ${selector}`);
+                    return false;
+                }
+            }
+            
+            // 3. ACTUALIZAR DOCUMENTOS
+            function updateVehicleDocuments(documents) {
+                const container = document.querySelector('.vehicle-documents');
+                if (!container) {
+                    console.warn('Contenedor de documentos no encontrado');
+                    return;
+                }
+                
+                if (documents && documents.length > 0) {
+                    container.innerHTML = documents.map(doc => {
+                        const fileName = doc.file_name || doc.name || 'Documento';
+                        let expirationDate = 'Sin fecha';
+                        
+                        if (doc.expiration_date) {
+                            if (typeof doc.expiration_date === 'string') {
+                                expirationDate = doc.expiration_date;
+                            } else if (doc.expiration_date && typeof doc.expiration_date === 'object') {
+                                // Intentar formatear la fecha
+                                try {
+                                    const date = new Date(doc.expiration_date);
+                                    if (!isNaN(date.getTime())) {
+                                        expirationDate = date.toLocaleDateString('es-ES');
+                                    }
+                                } catch (e) {
+                                    console.warn('No se pudo formatear la fecha:', e);
+                                }
+                            }
+                        }
+                        
+                        return `
+                            <div class="document-item mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="document-icon-small bg-primary bg-opacity-10 me-3">
+                                        <i class="bi bi-file-text-fill text-primary"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <p class="fw-medium text-dark mb-0 small">${fileName}</p>
+                                        <p class="text-muted small mb-0">
+                                            ${expirationDate !== 'Sin fecha' ? 'Vence: ' + expirationDate : 'Sin fecha'}
+                                        </p>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-primary" title="Descargar">
+                                        <i class="bi bi-download"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    container.innerHTML = `
+                        <div class="text-center py-3">
+                            <i class="bi bi-file-earmark-x fs-1 text-muted"></i>
+                            <p class="text-muted small mt-2">No hay documentos disponibles</p>
+                        </div>
+                    `;
+                }
+            }
+            
+            // 4. RESALTAR FILA ACTIVA
+            function highlightActiveRow(vehicleId) {
+                document.querySelectorAll('.vehicle-row').forEach(row => {
+                    row.classList.remove('active');
+                });
+                
+                const activeRow = document.querySelector(`.vehicle-row[data-vehicle-id="${vehicleId}"]`);
+                if (activeRow) {
+                    activeRow.classList.add('active');
+                }
+            }
+            
+            // 5. FILTRAR UNIDADES
+            function filterVehicles() {
+                const searchTerm = document.getElementById('vehicleSearch').value.toLowerCase();
+                const typeFilter = document.getElementById('typeFilter').value;
+                const rows = document.querySelectorAll('.vehicle-row');
+                let visibleCount = 0;
+                
+                rows.forEach(row => {
+                    const vehicleBrand = row.getAttribute('data-vehicle-brand').toLowerCase();
+                    const vehicleModel = row.getAttribute('data-vehicle-model').toLowerCase();
+                    const vehicleType = row.getAttribute('data-vehicle-type').toLowerCase();
+                    const vehicleLicensePlate = row.getAttribute('data-vehicle-license_plate').toLowerCase();
+                    
+                    const matchesSearch = searchTerm === '' || 
+                        vehicleBrand.includes(searchTerm) || 
+                        vehicleModel.includes(searchTerm) ||
+                        vehicleLicensePlate.includes(searchTerm);
+                    
+                    const matchesType = typeFilter === '' || vehicleType === typeFilter;
+                    
+                    if (matchesSearch && matchesType) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                
+                // Actualizar contadores
+                document.getElementById('vehicleCount').textContent = visibleCount + ' unidades';
+                document.getElementById('showingCount').textContent = visibleCount;
+            }
+            
+            // 6. ASIGNAR EVENTOS
+            function setupEventListeners() {
+                // Eventos para filas de unidades
+                document.querySelectorAll('.vehicle-row').forEach(row => {
+                    row.addEventListener('click', function(e) {
+                        if (!e.target.closest('button')) {
+                            loadVehicleInfo(this);
+                        }
+                    });
+                });
+                
+                // Eventos para botones "Ver"
+                document.querySelectorAll('.btn-view-vehicle').forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const vehicleRow = this.closest('.vehicle-row');
+                        if (vehicleRow) {
+                            loadVehicleInfo(vehicleRow);
+                        } else {
+                            console.error('No se encontró la fila de la unidad');
+                        }
+                    });
+                });
+                
+                // Eventos para botones de acción
+                document.querySelectorAll('.btn-edit').forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const vehicleId = this.getAttribute('data-vehicle-id');
+                        console.log('Editar unidad:', vehicleId);
+                        // Aquí iría la lógica para abrir modal de edición
+                    });
+                });
+                
+                document.querySelectorAll('.btn-delete').forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const vehicleId = this.getAttribute('data-vehicle-id');
+                        if (confirm(`¿Está seguro de eliminar la unidad ${vehicleId}?`)) {
+                            console.log('Eliminar unidad:', vehicleId);
+                            // Aquí iría la lógica para eliminar
+                        }
+                    });
+                });
+                
+                // Eventos para búsqueda y filtros
+                const vehicleSearch = document.getElementById('vehicleSearch');
+                const typeFilter = document.getElementById('typeFilter');
+                
+                if (vehicleSearch) {
+                    vehicleSearch.addEventListener('input', filterVehicles);
+                }
+                
+                if (typeFilter) {
+                    typeFilter.addEventListener('change', filterVehicles);
+                }
+                
+                // Evento para botón Crear Nueva Unidad
+                document.querySelector('.btn-add').addEventListener('click', function() {
+                    console.log('Crear nueva unidad');
+                    // Aquí iría la lógica para abrir modal de creación
+                });
+                
+                // Evento para botón Editar en la tarjeta
+                document.querySelector('.card-body .btn-edit').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const activeRow = document.querySelector('.vehicle-row.active');
+                    if (activeRow) {
+                        const vehicleId = activeRow.getAttribute('data-vehicle-id');
+                        console.log('Editar unidad activa:', vehicleId);
+                        // Aquí iría la lógica para abrir modal de edición
+                    }
+                });
+            }
+            
+            // 7. DEPURACIÓN - Verificar que todo esté configurado correctamente
+            function debugSetup() {
+                console.log('=== DEPURACIÓN ===');
+                console.log('Filas .vehicle-row encontradas:', document.querySelectorAll('.vehicle-row').length);
+                console.log('Botones .btn-view-vehicle encontrados:', document.querySelectorAll('.btn-view-vehicle').length);
+                
+                // Verificar elementos de la tarjeta
+                const requiredElements = [
+                    '.vehicle-brand',
+                    '.vehicle-model', 
+                    '.vehicle-color',
+                    '.vehicle-type',
+                    '.vehicle-year',
+                    '.vehicle-mileage',
+                    '.vehicle-fuel_capacity',
+                    '.vehicle-license_plate',
+                    '.vehicle-vin',
+                    '.vehicle-status',
+                    '.vehicle-documents'
+                ];
+                
+                requiredElements.forEach(selector => {
+                    const element = document.querySelector(selector);
+                    console.log(`${selector}:`, element ? '✓ ENCONTRADO' : '✗ NO ENCONTRADO');
+                });
+            }
+            
+            // 8. INICIALIZACIÓN
+            function initialize() {
+                console.log('Inicializando gestión de unidades...');
+                
+                // Depuración
+                debugSetup();
+                
+                // Configurar event listeners
+                setupEventListeners();
+                
+                // Cargar primera unidad si existe
+                const firstVehicleRow = document.querySelector('.vehicle-row');
+                if (firstVehicleRow) {
+                    console.log('Cargando primera unidad...');
+                    loadVehicleInfo(firstVehicleRow);
+                } else {
+                    console.warn('No se encontraron unidades');
+                }
+                
+                // Cargar unidad desde URL si existe
+                const urlParams = new URLSearchParams(window.location.search);
+                const vehicleIdFromUrl = urlParams.get('vehicle');
+                if (vehicleIdFromUrl) {
+                    const vehicleRow = document.querySelector(`.vehicle-row[data-vehicle-id="${vehicleIdFromUrl}"]`);
+                    if (vehicleRow) {
+                        loadVehicleInfo(vehicleRow);
+                    }
+                }
+            }
+            
+            // Iniciar todo
+            initialize();
+        });
+    </script>
 </x-app-layout>

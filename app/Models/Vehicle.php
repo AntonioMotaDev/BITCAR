@@ -18,6 +18,7 @@ class Vehicle extends Model
         'mileage',
         'fuel_capacity',
         'status',
+        'image',
     ];
 
     protected $casts = [
