@@ -63,14 +63,12 @@
         </div>
 
         <!-- Mobile Toggle -->
-        <div>
             <button @click="open = ! open" class="navbar-mobile-toggle">
                 <svg stroke="currentColor" fill="none" viewBox="0 0 24 24">
                     <path :class="{'hidden': open, 'inline-flex': ! open }" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
-        </div>
     </div>
 
     <!-- Mobile Menu -->

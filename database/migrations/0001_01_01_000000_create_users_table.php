@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('password');
             $table->enum('role', ['admin', 'supervisor', 'operador'])->default('operador');
             $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->string('image')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

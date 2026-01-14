@@ -2,6 +2,8 @@
 
 /* Importar estilos de componentes */
 @import 'navbar.css';
+@import 'modals.css';
+@import 'index.css';
 
 /* Variables CSS personalizadas */
 :root {
@@ -9,7 +11,7 @@
     --color-primary-dark: #1558b0;
     --color-secondary: #fbbc05;
     --color-accent: #34a853;
-    --color-background: #f5f6fa;
+    --color-background: #e6e7ead2;
     --color-surface: #ffffff;
     --color-text: #222222;
     --color-text-light: #757575;
@@ -87,6 +89,7 @@ body {
     background-color: var(--color-dark-blue);
     color: white;
     transition: var(--transition-fast);
+    border-radius: 10px;
 }
 
 .btn-altivus:hover {
@@ -106,4 +109,48 @@ body {
 .rounded-custom {
     border-radius: 1rem;
 }
+
+.btn-add {
+    background-color: var(--color-median-blue);
+    color: white;
+    transition: var(--transition-fast);
+    border-radius: 10px;
+}
+
+.search-container {
+            max-width: 100%;
+        }
+        
+.search-box {
+    border: 1px solid #dee2e6;
+}
+        
+.search-box .form-control:focus {
+    box-shadow: none;
+    border-color: #dee2e6;
+}
+
+.btn-edit{
+    background-color: var(--color-dark-gray);
+    border-radius: 15px;
+    color: white;
+}
+
+.btn-eye{
+    background-color: var(--color-light-blue);
+    border-radius: 15px;
+    color: white;
+}
+
+.btn-delete{
+    background-color: var(--color-pink);
+    border-radius: 15px;
+    color: white;
+}
+
+.icon-p{
+    color: var(--color-terracota);
+}
+
+        
 
