@@ -1,136 +1,199 @@
-<div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+<div class="modal fade" id="createVehicleModal" tabindex="-1" aria-labelledby="createVehicleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="createUserModalLabel">
-                    <i class="bi bi-person-plus me-2"></i>Crear Nuevo Usuario
+                <h5 class="modal-title" id="createVehicleModalLabel">
+                    <i class="bi bi-car-front-plus me-2"></i>Crear Nueva Unidad
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="createUserForm" action="{{ route('users.store') }}" method="POST" enctype="multipart/form-data">
+            <form id="createVehicleForm" action="{{ route('vehicles.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
                     <div class="row">
-                        <!-- Información Personal -->
+                        <!-- Información General -->
                         <div class="col-md-6">
                             <h6 class="fw-bold text-prim mb-3">
-                                <i class="bi bi-person-badge me-2"></i>Información Personal
+                                <i class="bi bi-car-front me-2"></i>Información General
                             </h6>
                             
-                            <!-- Nombre Completo -->
+                            <!-- Marca -->
                             <div class="mb-3">
-                                <label for="name" class="form-label">
-                                    <i class="bi bi-person-fill me-1"></i>Nombre Completo *
+                                <label for="brand" class="form-label">
+                                    <i class="bi bi-tag-fill  me-1"></i>Marca *
                                 </label>
                                 <input type="text" 
-                                       class="form-control @error('name') is-invalid @enderror" 
-                                       id="name" 
-                                       name="name" 
-                                       value="{{ old('name') }}"
-                                       placeholder="Ej: Juan Pérez López"
+                                       class="form-control @error('brand') is-invalid @enderror" 
+                                       id="brand" 
+                                       name="brand" 
+                                       value="{{ old('brand') }}"
+                                       placeholder="Ej: Nissan"
                                        required
                                        autofocus>
-                                @error('name')
+                                @error('brand')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                             
-                            <!-- Correo Electrónico -->
+                            <!-- Modelo -->
                             <div class="mb-3">
-                                <label for="email" class="form-label">
-                                    <i class="bi bi-envelope-fill me-1"></i>Correo Electrónico *
+                                <label for="model" class="form-label">
+                                    <i class="bi-car-front-fill me-1"></i>Modelo *
                                 </label>
-                                <input type="email" 
-                                       class="form-control @error('email') is-invalid @enderror" 
-                                       id="email" 
-                                       name="email" 
-                                       value="{{ old('email') }}"
-                                       placeholder="Ej: usuario@empresa.com"
+                                <input type="model" 
+                                       class="form-control @error('model') is-invalid @enderror" 
+                                       id="model" 
+                                       name="model" 
+                                       value="{{ old('model') }}"
+                                       placeholder="Ej: Frontier"
                                        required>
-                                @error('email')
+                                @error('model')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- Año -->
+                            <div class="mb-3">
+                                <label for="year" class="form-label">
+                                    <i class="bi  bi-calendar-date-fill  me-1"></i>Año *
+                                </label>
+                                <input type="number" 
+                                       class="form-control @error('year') is-invalid @enderror" 
+                                       id="year" 
+                                       name="year" 
+                                       value="{{ old('year') }}"
+                                       placeholder="Ej: 2005"
+                                       required>
+                                @error('year')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- Color -->
+                            <div class="mb-3">
+                                <label for="color" class="form-label">
+                                    <i class="bi bi-palette-fill me-1"></i>Color *
+                                </label>
+                                <input type="text" 
+                                       class="form-control @error('color') is-invalid @enderror" 
+                                       id="color" 
+                                       name="color" 
+                                       value="{{ old('color') }}"
+                                       placeholder="Ej: Blanco"
+                                       required
+                                       autofocus>
+                                @error('color')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- Capacidad Tanque Gasolina -->
+                            <div class="mb-3">
+                            <label for="fuel_capacity" class="form-label">
+                                    <i class="bi bi-fuel-pump-fill me-1"></i>Capacidad Tanque Gasolina *
+                                </label>
+                                <input type="number" 
+                                       class="form-control @error('fuel_capacity') is-invalid @enderror" 
+                                       id="fuel_capacity" 
+                                       name="fuel_capacity" 
+                                       value="{{ old('fuel_capacity') }}"
+                                       placeholder="000.00"
+                                       required
+                                       autofocus>
+                                @error('fuel_capacity')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                             
-                            <!-- Contraseña -->
-                            <div class="mb-3">
-                                <label for="password" class="form-label">
-                                    <i class="bi bi-lock-fill me-1"></i>Contraseña *
-                                </label>
-                                <div class="input-group">
-                                    <input type="password" 
-                                           class="form-control @error('password') is-invalid @enderror" 
-                                           id="password" 
-                                           name="password" 
-                                           placeholder="Mínimo 8 caracteres"
-                                           required>
-                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
-                                </div>
-                                @error('password')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <small class="text-muted">La contraseña debe tener al menos 8 caracteres.</small>
-                            </div>
-                            
-                            <!-- Confirmar Contraseña -->
-                            <div class="mb-3">
-                                <label for="password_confirmation" class="form-label">
-                                    <i class="bi bi-lock-fill me-1"></i>Confirmar Contraseña *
-                                </label>
-                                <div class="input-group">
-                                    <input type="password" 
-                                           class="form-control" 
-                                           id="password_confirmation" 
-                                           name="password_confirmation" 
-                                           placeholder="Repite la contraseña"
-                                           required>
-                                    <button class="btn btn-outline-secondary" type="button" id="togglePasswordConfirm">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
-                                </div>
-                            </div>
                         </div>
                         
                         <!-- Información Adicional -->
                         <div class="col-md-6">
                             <h6 class="fw-bold text-prim mb-3">
-                                <i class="bi bi-gear-fill me-2"></i>Configuración del Usuario
+                                <i class="bi bi-gear-fill me-2"></i>Configuración de la Unidad
                             </h6>
                             
-                            <!-- Rol -->
+                            <!-- Tipo -->
                             <div class="mb-3">
-                                <label for="role" class="form-label">
-                                    <i class="bi bi-person-badge me-1"></i>Rol del Usuario *
+                                <label for="type" class="form-label">
+                                    <i class="bi bi-truck me-1"></i>Tipo de Unidad *
                                 </label>
-                                <select class="form-select @error('role') is-invalid @enderror" 
-                                        id="role" 
-                                        name="role" 
+                                <select class="form-select @error('type') is-invalid @enderror" 
+                                        id="type" 
+                                        name="type" 
                                         required>
-                                    <option value="" disabled selected>Selecciona un rol</option>
-                                    @foreach($roleOptions as $value => $data)
+                                    <option value="" disabled selected>Selecciona un tipo</option>
+                                    @foreach($typeOptions as $value => $data)
                                         <option value="{{ $value }}" {{ old('role') == $value ? 'selected' : '' }}>
                                              {{ $data['label'] }}
                                         </option>
                                     @endforeach
                                 </select>
-                                @error('role')
+                                @error('type')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
-                                <div class="mt-2">
-                                    <small class="text-muted">
-                                        <strong>Administrador:</strong> Acceso completo al sistema<br>
-                                        <strong>Supervisor:</strong> Gestiona equipos y operadores<br>
-                                        <strong>Operador:</strong> Acceso desde app móvil
-                                    </small>
-                                </div>
+                            </div>
+
+                            <!-- Placas -->
+                            <div class="mb-3">
+                                <label for="license_plate" class="form-label">
+                                    <i class="bi bi-card-text me-1"></i>Placas *
+                                </label>
+                                <input type="text" 
+                                       class="form-control @error('license_plate') is-invalid @enderror" 
+                                       id="license_plate" 
+                                       name="license_plate" 
+                                       value="{{ old('license_plate') }}"
+                                       placeholder="Ej: DEF-456"
+                                       required
+                                       autofocus>
+                                @error('license_plate')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- VIN -->
+                            <div class="mb-3">
+                                <label for="vin" class="form-label">
+                                    <i class="bi bi-upc-scan me-1"></i>VIN *
+                                </label>
+                                <input type="text" 
+                                       class="form-control @error('vin') is-invalid @enderror" 
+                                       id="vin" 
+                                       name="vin" 
+                                       value="{{ old('vin') }}"
+                                       placeholder="Ej: 2HGBH41JXMN109187"
+                                       required
+                                       autofocus>
+                                @error('vin')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- Kilometraje -->
+                            <div class="mb-3">
+                                <label for="mileage" class="form-label">
+                                    <i class="bi bi-speedometer2 me-1"></i>Kilometraje *
+                                </label>
+                                <input type="number" 
+                                       class="form-control @error('mileage') is-invalid @enderror" 
+                                       id="mileage" 
+                                       name="mileage" 
+                                       step="0.01"
+                                       min="0"
+                                       value="{{ old('mileage') }}"
+                                       placeholder="000.00"
+                                       required
+                                       autofocus>
+                                @error('mileage')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <!-- Imagen de Perfil -->
                             <div class="mb-3">
                                 <label for="image" class="form-label">
-                                    <i class="bi bi-image-fill me-1"></i>Foto de Perfil (Opcional)
+                                    <i class="bi bi-image-fill me-1"></i>Foto de Perfil de la Unidad (Opcional)
                                 </label>
                                 <div class="input-group">
                                     <input type="file" 
@@ -168,7 +231,7 @@
                         <i class="bi bi-x me-1"></i>Cancelar
                     </button>
                     <button type="submit" class="btn btn-create" id="submitBtn">
-                        <i class="bi bi-check me-1"></i>Crear Usuario
+                        <i class="bi bi-check me-1"></i>Crear Unidad
                     </button>
                 </div>
             </form>
@@ -179,29 +242,6 @@
 <!-- JavaScript para el modal -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. Toggle para mostrar/ocultar contraseña
-    const togglePassword = document.getElementById('togglePassword');
-    const togglePasswordConfirm = document.getElementById('togglePasswordConfirm');
-    const passwordInput = document.getElementById('password');
-    const passwordConfirmInput = document.getElementById('password_confirmation');
-    
-    if (togglePassword && passwordInput) {
-        togglePassword.addEventListener('click', function() {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.querySelector('i').classList.toggle('bi-eye');
-            this.querySelector('i').classList.toggle('bi-eye-slash');
-        });
-    }
-    
-    if (togglePasswordConfirm && passwordConfirmInput) {
-        togglePasswordConfirm.addEventListener('click', function() {
-            const type = passwordConfirmInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordConfirmInput.setAttribute('type', type);
-            this.querySelector('i').classList.toggle('bi-eye');
-            this.querySelector('i').classList.toggle('bi-eye-slash');
-        });
-    }
     
     // 2. Vista previa de imagen
     const imageInput = document.getElementById('image');

@@ -152,5 +152,31 @@ body {
     color: var(--color-terracota);
 }
 
+.btn-create{
+    background-color: var(--color-median-blue);
+    border-radius: 15px;
+    color: white;
+}
+
+.btn-cancel{
+    background-color: var(--color-pink);
+    border-radius: 15px;
+    color: white;
+}
+
+.btn-i{
+    background-color: var(--color-terracota);
+    border-radius: 15px;
+    color: white;
+}
+
+.text-prim{
+    color: var(--color-dark-blue) !important;
+}
+
+.text-secondary{
+    color: var(--color-text-light),
+}
+
         
 

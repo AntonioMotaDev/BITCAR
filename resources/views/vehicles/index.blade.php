@@ -5,7 +5,7 @@
                 GESTIONAR UNIDADES VEHICULARES
             </h2>
             <div>
-                <button class="btn btn-add">
+                <button class="btn btn-add" data-bs-toggle="modal" data-bs-target="#createVehicleModal">
                     <i class="bi bi-plus-lg"></i> Crear Nueva Unidad
                 </button>
             </div>
@@ -23,14 +23,14 @@
                         <!-- Encabezado con avatar -->
                         <div class="d-flex align-items-start mb-4">
                             <div class="avatar-large me-4 flex-shrink-0">
-                                <i class="bi bi-car-front fs-1 text-white"></i>
+                                <i class="bi bi-car-front fs-1"></i>
                             </div>
                             
-                            <div class="flex-grow-1">
-                                <h1 class="h4 fw-bold text-dark mb-1 vehicle-brand">
+                            <div class="flex-grow-1 info-header">
+                                <h1 class="h4 fw-bold mb-1 vehicle-brand">
                                     {{ $vehicles->first()->brand ?? 'Seleccione una unidad' }}
                                 </h1>
-                                <p class="h6 text-secondary mb-0 vehicle-model">
+                                <p class="h6 mb-0 vehicle-model">
                                     {{ $vehicles->first()->model ?? 'N/A' }}
                                 </p>
                             </div>
@@ -53,33 +53,28 @@
                                         <p class="info-value vehicle-type">{{ $vehicles->first()->type ?? 'N/A' }}</p>
                                     </div>
                                 </div>
-                                
                                 <div class="row">
-                                    <div class="col-md-6 mb-3">
+                                    <div class="col-md-4 mb-3">
                                         <p class="info-label">Placa</p>
                                         <p class="info-value vehicle-license_plate">{{ $vehicles->first()->license_plate ?? 'N/A' }}</p>
                                     </div>
-                                    <div class="col-md-6 mb-3">
-                                        <p class="info-label">VIN</p>
-                                        <p class="info-value vehicle-vin">{{ $vehicles->first()->vin ?? 'N/A' }}</p>
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
+                                    <div class="col-md-4 mb-3">
                                         <p class="info-label">Kilometraje</p>
                                         <p class="info-value vehicle-mileage">{{ $vehicles->first()->mileage ?? 'N/A' }}</p>
                                     </div>
-                                    <div class="col-md-6 mb-3">
-                                        <p class="info-label">Combustible</p>
-                                        <p class="info-value vehicle-fuel_capacity">{{ $vehicles->first()->fuel_capacity ?? 'N/A' }}</p>
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-12 mb-3">
+                                    <div class="col-md-4 mb-3">
                                         <p class="info-label">Estado</p>
                                         <p class="info-value vehicle-status">{{ $vehicles->first()->status ?? 'N/A' }}</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <p class="info-label">Cap Max.Combustible</p>
+                                        <p class="info-value vehicle-fuel_capacity">{{ $vehicles->first()->fuel_capacity ?? 'N/A' }}</p>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <p class="info-label">VIN</p>
+                                        <p class="info-value vehicle-vin">{{ $vehicles->first()->vin ?? 'N/A' }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -105,7 +100,7 @@
                                 <div class="document-item mb-3">
                                     <div class="d-flex align-items-center">
                                         <div class="document-icon-small bg-primary bg-opacity-10 me-3">
-                                            <i class="bi bi-file-text-fill text-primary"></i>
+                                            <i class="bi bi-file-text-fill text-prim"></i>
                                         </div>
                                         <div class="flex-grow-1">
                                             <p class="fw-medium text-dark mb-0 small">{{ $document->file_name }}</p>
@@ -130,7 +125,7 @@
                 </div>
             </div>
 
-            <!-- Usuarios Registrados -->
+            <!-- Unidades Registradas -->
             <div class="col-lg-8">
                 <div>
                     <div class="card-body">
@@ -148,7 +143,7 @@
                             </div>
                             <div class="col-12 py-4">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <h2 class="h3 fw-bold text-dark mb-0">Usuarios Registrados</h2>
+                                    <h2 class="h3 fw-bold text-secondary mb-0">Unidades Registradas</h2>
                                 </div>
                             </div>
                         </div>
@@ -185,10 +180,10 @@
                                         <td class="ps-3">
                                             <div class="d-flex align-items-center">
                                                 <div class="avatar-small bg-primary bg-opacity-10 me-3">
-                                                    <i class="bi bi-car-front text-primary"></i>
+                                                    <i class="bi bi-car-front text-prim"></i>
                                                 </div>
                                                 <div>
-                                                    <h3 class="h6 fw-bold text-dark mb-0">{{ $vehicle->brand }}</h3>
+                                                    <h3 class="h6 fw-bold mb-0 info-header">{{ $vehicle->brand }}</h3>
                                                 </div>
                                             </div>
                                         </td>
@@ -203,9 +198,22 @@
                                                         title="Ver detalles">
                                                     <i class="bi bi-eye"></i> Ver
                                                 </button>
-                                                <button class="btn btn-edit" 
+                                                <button class="btn btn-edit"
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#editVehicleModal"
                                                         data-vehicle-id="{{ $vehicle->id }}"
-                                                        title="Editar unidad">
+                                                        data-vehicle-brand="{{ $vehicle->brand }}"
+                                                        data-vehicle-model="{{ $vehicle->model }}"
+                                                        data-vehicle-year="{{ $vehicle->year }}"
+                                                        data-vehicle-color="{{ $vehicle->color }}"
+                                                        data-vehicle-fuel-capacity="{{ $vehicle->fuel_capacity }}"
+                                                        data-vehicle-license-plate="{{ $vehicle->license_plate }}"
+                                                        data-vehicle-vin="{{ $vehicle->vin }}"
+                                                        data-vehicle-mileage="{{ $vehicle->mileage }}"
+                                                        data-vehicle-type="{{ $vehicle->type }}"
+                                                        title="Editar unidad"
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#editVehicleModal">
                                                     <i class="bi bi-pencil-square"></i> Editar
                                                 </button>
                                                 <button class="btn btn-delete" 
@@ -245,6 +253,8 @@
             </div>
         </div>
     </div>
+    @include('vehicles.create-modal')
+    @include('vehicles.edit-modal')
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -417,15 +427,7 @@
             
             // 6. ASIGNAR EVENTOS
             function setupEventListeners() {
-                // Eventos para filas de unidades
-                document.querySelectorAll('.vehicle-row').forEach(row => {
-                    row.addEventListener('click', function(e) {
-                        if (!e.target.closest('button')) {
-                            loadVehicleInfo(this);
-                        }
-                    });
-                });
-                
+
                 // Eventos para botones "Ver"
                 document.querySelectorAll('.btn-view-vehicle').forEach(button => {
                     button.addEventListener('click', function(e) {

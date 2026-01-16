@@ -23,14 +23,14 @@
                         <!-- Encabezado con avatar -->
                         <div class="d-flex align-items-start mb-4">
                             <div class="avatar-large me-4 flex-shrink-0">
-                                <i class="bi bi-person-fill fs-1 text-white"></i>
+                                <i class="bi bi-person-fill fs-1"></i>
                             </div>
                             
-                            <div class="flex-grow-1">
-                                <h1 class="h4 fw-bold text-dark mb-1 user-name">
+                            <div class="flex-grow-1 info-header">
+                                <h1 class="h4 fw-bold  mb-1 user-name">
                                     {{ $users->first()->name ?? 'Seleccione un usuario' }}
                                 </h1>
-                                <p class="h6 text-secondary mb-0 user-id">
+                                <p class="h6  mb-0 user-id">
                                     {{ $users->first()->id ? 'ID: ' . $users->first()->id : '' }}
                                 </p>
                             </div>
@@ -72,13 +72,13 @@
                 <div class="card card-custom border-0 shadow-sm">
                     <div class="card-body p-4">
                         <h3 class="h5 fw-bold text-dark mb-3">Documentos del Personal</h3>
-                        <div class="document-list">
+                        <div class="document-list user-documents">
                             <!-- Licencia de Conducir -->
                             <div class="document-item mb-3">
                                 @foreach($documents as $document)
                                 <div class="d-flex align-items-center">
                                     <div class="document-icon-small bg-primary bg-opacity-10 me-3">
-                                        <i class="bi bi-file-text-fill text-primary"></i>
+                                        <i class="bi bi-file-text-fill text-prim"></i>
                                     </div>
                                     <div class="flex-grow-1">
                                         <p class="fw-medium text-dark mb-0 small">{{ $document->file_name}}:</p>
@@ -113,7 +113,7 @@
                             </div>
                             <div class="col-12 py-4">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <h2 class="h3 fw-bold text-dark mb-0">Usuarios Registrados</h2>
+                                    <h2 class="h3 fw-bold text-secondary mb-0">Usuarios Registrados</h2>
                                 </div>
                             </div>
                         </div>
@@ -144,10 +144,10 @@
                                             <td class="ps-3">
                                                 <div class="d-flex align-items-center">
                                                     <div class="avatar-small bg-primary bg-opacity-10 me-3">
-                                                        <i class="bi bi-person-fill text-primary"></i>
+                                                        <i class="bi bi-person-fill text-prim"></i>
                                                     </div>
                                                     <div>
-                                                        <h3 class="h6 fw-bold text-dark mb-0">{{$user->name}}</h3>
+                                                        <h3 class="h6 fw-bold mb-0">{{$user->name}}</h3>
                                                     </div>
                                                 </div>
                                             </td>
@@ -163,7 +163,12 @@
                                                     </button>
                                                     <button class="btn btn-edit" 
                                                             data-user-id="{{ $user->id }}"
-                                                            title="Editar usuario">
+                                                            data-user-name="{{ $user->name }}"
+                                                            data-user-email="{{ $user->email }}"
+                                                            data-user-role="{{ $user->role }}"
+                                                            title="Editar usuario"
+                                                            data-bs-toggle="modal" 
+                                                            data-bs-target="#editUserModal">
                                                         <i class="bi bi-pencil-square"></i> Editar
                                                     </button>
                                                     <button class="btn btn-delete" 
@@ -204,6 +209,7 @@
         </div>
     </div>
     @include('users.create-modal')
+    @include('users.edit-modal')
 
      <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -222,7 +228,6 @@
                 document.querySelector('.user-id').textContent = `ID: ${userId}`;
                 document.querySelector('.user-role').textContent = userRole;
                 document.querySelector('.user-email').textContent = userEmail;
-                document.querySelector('.user-nss').textContent = userNss || 'N/A';
                 
                 // Actualizar estado con badge
                 const statusBadge = document.querySelector('.user-status-badge');
@@ -248,7 +253,7 @@
                         <div class="document-item mb-3">
                             <div class="d-flex align-items-center">
                                 <div class="document-icon-small bg-primary bg-opacity-10 me-3">
-                                    <i class="bi bi-file-text-fill text-primary"></i>
+                                    <i class="bi bi-file-text-fill text-prim"></i>
                                 </div>
                                 <div class="flex-grow-1">
                                     <p class="fw-medium text-dark mb-0 small">${doc.file_name}</p>
@@ -274,15 +279,15 @@
             
             // 3. RESALTAR FILA ACTIVA
             function highlightActiveRow(userId) {
+                // Remover clase 'active' de todas las filas
                 document.querySelectorAll('.user-row').forEach(row => {
                     row.classList.remove('active');
-                    row.style.backgroundColor = '';
                 });
                 
+                // Agregar clase 'active' a la fila seleccionada
                 const activeRow = document.querySelector(`.user-row[data-user-id="${userId}"]`);
                 if (activeRow) {
                     activeRow.classList.add('active');
-                    activeRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }
             }
             
@@ -292,20 +297,8 @@
                 document.querySelector('.user-id').textContent = '';
                 document.querySelector('.user-role').textContent = 'N/A';
                 document.querySelector('.user-email').textContent = 'N/A';
-                document.querySelector('.user-nss').textContent = 'N/A';
                 updateUserDocuments([]);
             }
-            
-            // 6. ASIGNAR EVENTOS
-            // Eventos para filas de usuarios
-            document.querySelectorAll('.user-row').forEach(row => {
-                // Click en la fila completa
-                row.addEventListener('click', function(e) {
-                    if (!e.target.closest('button')) {
-                        loadUserInfo(this);
-                    }
-                });
-            });
             
             // Eventos para botones "Ver"
             document.querySelectorAll('.btn-view-user').forEach(button => {
@@ -313,16 +306,6 @@
                     e.stopPropagation();
                     const userRow = this.closest('.user-row');
                     loadUserInfo(userRow);
-                });
-            });
-            
-            // Eventos para botones de acción
-            document.querySelectorAll('.btn-edit').forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const userId = this.getAttribute('data-user-id');
-                    alert(`Editar usuario ${userId}`);
-                    // Aquí iría la lógica para abrir modal de edición
                 });
             });
             

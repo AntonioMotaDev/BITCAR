@@ -10,6 +10,9 @@ use App\Models\Document;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -20,7 +23,12 @@ class UserController extends Controller
         
         $users = User::latest()->paginate(15);
         $documents = Document::all();
-        return view('users.index', compact('users','documents'));
+        $roleOptions = [
+            'admin' => ['label' => 'Administrador'],
+            'supervisor' => ['label' => 'Supervisor'],
+            'operador' => ['label' => 'Operador']
+        ];
+        return view('users.index', compact('users','documents','roleOptions'));
     }
 
     public function create(): View
@@ -40,7 +48,6 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|in:admin,supervisor,operador',
-            'status' => 'required|in:active,inactive',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
@@ -50,15 +57,25 @@ class UserController extends Controller
         $user->email = $validated['email'];
         $user->password = Hash::make($validated['password']);
         $user->role = $validated['role'];
-        $user->status = $validated['status'];
+        $user->status = 'active';
+        $user->save();
 
         // Manejar imagen si se subió
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('users', 'public');
-            $user->image = $path;
+            // Obtener el archivo
+            $image = $request->file('image');
+            
+            // Generar un nombre único para la imagen
+            $imageName = $user->id . '_' . $image->getClientOriginalName();
+            
+            // Guardar la imagen en storage/app/public/users
+            $path = $image->storeAs('users', $imageName, 'public');
+            
+            // Guardar solo el path en la base de datos
+            $user->image = $path; // Ejemplo: "users/1705251234_abc123.jpg"
+            $user->save();
         }
-
-        $user->save();
+        
 
         // Redirigir con mensaje de éxito
         return redirect()->route('users.index')

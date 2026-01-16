@@ -24,7 +24,7 @@
                 <span> Unidades </span>
             </a>
             
-            <a href="#" class="navbar-link">
+            <a href="{{ route('checklists.index') }}" class="navbar-link {{ request()->routeIs('checklists.*') ? 'active' : '' }}">
                 <i class="bi bi-gear fw-bold"></i>
                 <span> Configuración </span>
             </a>
