@@ -13,6 +13,7 @@ class ChecklistSeeder extends Seeder
         $checklist = Checklist::create([
             'name' => 'Inspección Vehicular Estándar',
             'description' => 'Checklist estándar para inspección de entrada y salida de vehículos',
+            'type' => 'trip_start',
             'is_active' => true,
         ]);
 

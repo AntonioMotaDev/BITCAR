@@ -194,5 +194,4 @@ class VehicleLogController extends Controller
             ],
         ], 201);
     }
-
 }
