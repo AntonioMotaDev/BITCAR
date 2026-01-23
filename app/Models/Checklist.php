@@ -10,6 +10,7 @@ class Checklist extends Model
     protected $fillable = [
         'name',
         'description',
+        'type',
         'is_active',
     ];
 
@@ -21,6 +22,11 @@ class Checklist extends Model
     public function checklistItems(): HasMany
     {
         return $this->hasMany(ChecklistItem::class)->orderBy('order');
+    }
+
+    public function getChecklistByType(string $type): ?Checklist
+    {
+        return self::where('type', $type)->where('is_active', true)->first();
     }
 
     public function vehicleLogs(): HasMany

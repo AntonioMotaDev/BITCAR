@@ -19,6 +19,7 @@ Route::prefix('v1')->group(function () {
 
         // Checklists
         Route::get('/checklists/active', [ChecklistController::class, 'active']);
+        Route::get('/checklists/{checklist_type}', [ChecklistController::class, 'showByType']);
         Route::post('/checklists/{checklist}/submit', [ChecklistController::class, 'submit']);
 
         // Vehicle Logs

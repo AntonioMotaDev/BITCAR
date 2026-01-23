@@ -77,4 +77,15 @@ class ChecklistService
             ->with('items')
             ->first();
     }
+
+    /**
+     * Obtener checklist por tipo
+     */
+    public function getChecklistByType(string $type): ?Checklist
+    {
+        return Checklist::where('type', $type)
+            ->where('is_active', true)
+            ->with('items')
+            ->first();
+    }
 }

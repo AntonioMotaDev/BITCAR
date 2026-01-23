@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ChecklistResource;
 use App\Services\ChecklistService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ChecklistController extends Controller
 {
@@ -16,16 +17,38 @@ class ChecklistController extends Controller
     /**
      * Obtener checklist activo
      */
-    public function active(): JsonResponse
+    public function active(Request $request): JsonResponse
     {
-        $checklist = $this->checklistService->getActiveChecklist();
+        $type = $request->query('type');
 
+        if($type) {
+            $checklist = $this->checklistService->getChecklistByType($type);
+            if (! $checklist) {
+                return response()->json([
+                    'message' => 'No se encontró un checklist activo para el tipo especificado',
+                ], 404);
+            }
+            return response()->json([
+                'data' => new ChecklistResource($checklist),
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'El parámetro type es requerido',
+            ], 422);
+        }
+    }
+
+    /**
+     * Obtener checklist por tipo
+     */
+    public function showByType(string $checklist_type): JsonResponse
+    {
+        $checklist = $this->checklistService->getChecklistByType($checklist_type);
         if (! $checklist) {
             return response()->json([
-                'message' => 'No hay checklist activo',
+                'message' => 'No se encontró un checklist para el tipo especificado',
             ], 404);
         }
-
         return response()->json([
             'data' => new ChecklistResource($checklist),
         ]);

@@ -15,6 +15,17 @@ return new class extends Migration
             $table->id();
             $table->string('name', 255);
             $table->text('description')->nullable();
+            $table->enum('type', [
+                'entry', 
+                'exit',
+                'trip_start',
+                'trip_checkpoint',
+                'trip_end',
+                'fuel',
+                'incident',
+                'maintenance', 
+                'other'
+                ])->default('other');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
             
