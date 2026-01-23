@@ -24,11 +24,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Vehicles - Solo admin
     Route::middleware('can:viewAny,App\Models\Vehicle')->group(function () {
         Route::resource('vehicles', VehicleController::class);
+        Route::post('vehicles/documents/upload', [VehicleController::class, 'uploadDocument'])->name('vehicles.documents.store');
     });
 
     // Users - Solo admin
     Route::middleware('can:viewAny,App\Models\User')->group(function () {
         Route::resource('users', UserController::class);
+        Route::post('users/documents/upload', [UserController::class, 'uploadDocument'])->name('users.documents.store');
     });
 
     // Checklists - Admin y supervisor

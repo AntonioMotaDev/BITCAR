@@ -270,6 +270,10 @@
                                     Desliza para ver más bitácoras
                                 </small>
                             </div>
+                            <!-- Paginación -->
+                            <div class="d-flex justify-content-end mt-2 pt-3 border-top">
+                                {{ $checklists->links('pagination::bootstrap-5') }}
+                            </div>
                         </div>
                     </div>
                 </div>
