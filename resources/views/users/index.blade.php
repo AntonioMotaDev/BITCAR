@@ -64,16 +64,18 @@
                             </div>
                         </div>
 
-                        <!-- Botón Editar -->
-                        <div class="position-relative" style="min-height: 60px;" >
-                            <button href="#" class="btn btn-edit position-absolute bottom-0 end-0 d-flex align-items-center px-4 py-2 btn-edit-left"
-                                data-bs-toggle="modal" 
-                                data-bs-target="#editUserModal"
-                                title="Editar Usuario">
-                                <i class="bi bi-pencil-square me-2"></i>
-                                Editar
-                            </button>
-                        </div>
+                        @if($users->isNotEmpty())
+                            <!-- Botón Editar -->
+                            <div class="position-relative" style="min-height: 60px;" >
+                                <button href="#" class="btn btn-edit position-absolute bottom-0 end-0 d-flex align-items-center px-4 py-2 btn-edit-left"
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#editUserModal"
+                                    title="Editar Usuario">
+                                    <i class="bi bi-pencil-square me-2"></i>
+                                    Editar
+                                </button>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
@@ -91,15 +93,17 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="position-relative" style="min-height: 60px;">
-                            <button href="#" class="btn btn-edit position-absolute bottom-0 end-0 d-flex align-items-center px-4 py-2 btn-upload-left"
-                                data-bs-toggle="modal" 
-                                data-bs-target="#uploadDocumentUsModal"
-                                title="Subir Documento">
-                                <i class="bi bi-upload me-2"></i> Subir
-                                
-                            </button>
-                        </div>
+                        @if($users->isNotEmpty())
+                            <div class="position-relative" style="min-height: 60px;">
+                                <button href="#" class="btn btn-edit position-absolute bottom-0 end-0 d-flex align-items-center px-4 py-2 btn-upload-left"
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#uploadDocumentUsModal"
+                                    title="Subir Documento">
+                                    <i class="bi bi-upload me-2"></i> Subir
+                                    
+                                </button>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -141,57 +145,68 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($users as $user)
-                                            <tr class="user-row {{ $loop->first ? 'active' : '' }}"
-                                                data-user-id="{{ $user->id }}"
-                                                data-user-name="{{ $user->name }}"
-                                                data-user-email="{{ $user->email }}"
-                                                data-user-role="{{ $user->role }}"
-                                                data-user-status="{{ $user->status }}"
-                                                data-user-image="{{ $user->image }}" 
-                                                data-user-documents='@json($user->userDocuments ?? [])'>
-                                                <!-- Resto del contenido de la fila -->
-                                                <td class="ps-3">
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="avatar-small bg-primary bg-opacity-10 me-3">
-                                                            <i class="bi bi-person-fill text-prim"></i>
-                                                        </div>
-                                                        <div>
-                                                            <h3 class="h6 fw-bold mb-0">{{$user->name}}</h3>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>{{$user->id}}</td>
-                                                <td>{{$user->role}}</td>
-                                                <td>{{$user->status}}</td>
-                                                <td class="text-end pe-3">
-                                                    <div class="d-flex gap-2 justify-content-end">
-                                                        <button class="btn btn-eye btn-sm btn-view-user" 
-                                                                data-user-id="{{ $user->id }}"
-                                                                title="Ver detalles">
-                                                            <i class="bi bi-eye"></i> Ver
-                                                        </button>
-                                                        <button class="btn btn-edit" 
-                                                                data-user-id="{{ $user->id }}"
-                                                                data-user-name="{{ $user->name }}"
-                                                                data-user-email="{{ $user->email }}"
-                                                                data-user-role="{{ $user->role }}"
-                                                                data-user-status="{{ $user->status }}"
-                                                                data-user-image="/storage/{{ $user->image }}"
-                                                                title="Editar usuario"
-                                                                data-bs-toggle="modal" 
-                                                                data-bs-target="#editUserModal">
-                                                            <i class="bi bi-pencil-square"></i> Editar
-                                                        </button>
-                                                        <button class="btn btn-delete" 
-                                                                data-user-id="{{ $user->id }}"
-                                                                title="Eliminar usuario">
-                                                            <i class="bi bi-trash"></i> Eliminar
-                                                        </button>
+                                        @if($users->isEmpty())
+                                            <tr>
+                                                <td colspan="6" class="text-center py-4">
+                                                    <div class="d-flex flex-column align-items-center">
+                                                        <i class="bi bi-person fs-1 text-muted mb-2"></i>
+                                                        <p class="text-muted mb-0">No hay usuarios registrados</p>
                                                     </div>
                                                 </td>
                                             </tr>
+                                        @else
+                                            @foreach($users as $user)
+                                                <tr class="user-row {{ $loop->first ? 'active' : '' }}"
+                                                    data-user-id="{{ $user->id }}"
+                                                    data-user-name="{{ $user->name }}"
+                                                    data-user-email="{{ $user->email }}"
+                                                    data-user-role="{{ $user->role }}"
+                                                    data-user-status="{{ $user->status }}"
+                                                    data-user-image="{{ $user->image }}" 
+                                                    data-user-documents='@json($user->userDocuments ?? [])'>
+                                                    <!-- Resto del contenido de la fila -->
+                                                    <td class="ps-3">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="avatar-small bg-primary bg-opacity-10 me-3">
+                                                                <i class="bi bi-person-fill text-prim"></i>
+                                                            </div>
+                                                            <div>
+                                                                <h3 class="h6 fw-bold mb-0">{{$user->name}}</h3>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>{{$user->id}}</td>
+                                                    <td>{{$user->role}}</td>
+                                                    <td>{{$user->status}}</td>
+                                                    <td class="text-end pe-3">
+                                                        <div class="d-flex gap-2 justify-content-end">
+                                                            <button class="btn btn-eye btn-sm btn-view-user" 
+                                                                    data-user-id="{{ $user->id }}"
+                                                                    title="Ver detalles">
+                                                                <i class="bi bi-eye"></i> Ver
+                                                            </button>
+                                                            <button class="btn btn-edit" 
+                                                                    data-user-id="{{ $user->id }}"
+                                                                    data-user-name="{{ $user->name }}"
+                                                                    data-user-email="{{ $user->email }}"
+                                                                    data-user-role="{{ $user->role }}"
+                                                                    data-user-status="{{ $user->status }}"
+                                                                    data-user-image="/storage/{{ $user->image }}"
+                                                                    title="Editar usuario"
+                                                                    data-bs-toggle="modal" 
+                                                                    data-bs-target="#editUserModal">
+                                                                <i class="bi bi-pencil-square"></i> Editar
+                                                            </button>
+                                                            <button class="btn btn-delete" 
+                                                                    data-user-id="{{ $user->id }}"
+                                                                    title="Eliminar usuario">
+                                                                <i class="bi bi-trash"></i> Eliminar
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
                                             @endforeach
+                                        @endif
                                     </tbody>
                                 </table>
                             </div>
@@ -209,7 +224,6 @@
     @include('users.create-modal')
     @include('users.edit-modal')
     @include('documents.upload-file-us-modal')
-
      <script>
         document.addEventListener('DOMContentLoaded', function() {
             let currentUserDocuments = [];
@@ -233,8 +247,9 @@
                 document.querySelector('.user-id').textContent = `ID: ${userId}`;
                 document.querySelector('.user-role').textContent = userRole;
                 document.querySelector('.user-email').textContent = userEmail;
+                document.querySelector('.user-status-badge').textContent = userStatus;
                 document.querySelector('.user-image').src = `/storage/${userImage}`;
-                
+                   
 
                 
                 currentSelectedUserId = userId;

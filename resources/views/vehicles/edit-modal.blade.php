@@ -199,13 +199,13 @@
                                         name="status" 
                                         required>
                                     <option value="" disabled selected>Selecciona un estado</option>
-                                    <option value="activo" {{ $vehicle->status == 'activo' ? 'selected' : '' }}>
+                                    <option value="activo">
                                         Activo
                                     </option>
-                                    <option value="mantenimiento" {{ $vehicle->status == 'mantenimiento' ? 'selected' : '' }}>
+                                    <option value="mantenimiento">
                                         Mantenimiento
                                     </option>
-                                    <option value="inactivo" {{ $vehicle->status == 'inactivo' ? 'selected' : '' }}>
+                                    <option value="inactivo">
                                         Inactivo
                                     </option>
                                 </select>

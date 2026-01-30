@@ -1,163 +1,361 @@
 <x-app-layout>
-    <div class="min-h-screen bg-neutral-50">
-        <!-- Header con tarjeta de confirmación de viaje -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            @if($activeTrips->count() > 0)
-                @php $trip = $activeTrips->first(); @endphp
-                <div class="bg-white rounded-xl shadow-sm border border-neutral-200 p-6 mb-6">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-4">
-                            <div class="bg-blue-100 rounded-full p-3">
-                                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                </svg>
-                            </div>
-                            <div class="flex items-center space-x-3">
-                                <svg class="w-10 h-10 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 class="text-lg font-bold text-amber-600">¿Confirma Inicio de Viaje?</h3>
-                                <p class="text-sm text-neutral-600 mt-1">Inicio: HH:MM</p>
-                                <p class="text-sm text-neutral-600">Operador: {{ $trip->user->name }}</p>
-                                <p class="text-sm text-neutral-600">Unidad: {{ $trip->vehicle->license_plate }}</p>
-                                <div class="flex items-center mt-1 text-xs text-neutral-500">
-                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    </svg>
-                                    Ver Bitácora
-                                </div>
-                                <p class="text-xs text-neutral-500 mt-1">Inicio: HH:MM</p>
-                            </div>
-                        </div>
-                        <div class="flex space-x-3">
-                            <button class="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors flex items-center space-x-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                </svg>
-                                <span>Aceptar</span>
-                            </button>
-                            <button class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors flex items-center space-x-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                                <span>Rechazar</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            @endif
+    <x-slot name="header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2 class="h2 fw-bold text-dark mb-0">
+                CONTROL DE VIAJES
+            </h2>
+        </div>
+    </x-slot>
 
-            <!-- Lista de viajes -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <!-- Columna izquierda: Viajes en curso -->
-                <div class="space-y-4">
-                    <h3 class="text-lg font-semibold text-neutral-800 mb-4">Viajes en Curso</h3>
-                    
-                    @forelse($activeTrips as $trip)
-                        <div class="bg-white rounded-xl shadow-sm border border-neutral-200 p-5">
-                            <div class="flex items-start space-x-4">
-                                <div class="bg-blue-100 rounded-full p-3">
-                                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                    </svg>
-                                </div>
-                                <div class="flex items-center space-x-3">
-                                    {{-- <svg class="w-10 h-10 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/>
-                                    </svg> --}}
-                                </div>
-                                <div class="flex-1">
-                                    <div class="flex items-center justify-between">
-                                        <h4 class="text-base font-bold text-amber-600">Viaje en curso</h4>
-                                    </div>
-                                    <p class="text-sm text-neutral-600 mt-1">Inicio: {{ $trip->start_time->format('H:i') }}</p>
-                                    <p class="text-sm text-neutral-600">Operador: {{ $trip->user->name }}</p>
-                                    <p class="text-sm text-neutral-600">Unidad: {{ $trip->vehicle->license_plate }}</p>
-                                    <div class="flex items-center mt-2 text-xs text-neutral-500">
-                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                        </svg>
-                                        ÚLTIMA LOCACIÓN, CP: 78999
+    <div class="container-fluid py-4 px-4">
+        <div class="row">
+            <div class="col-lg-4">
+                <!-- Viajes en Curso -->
+                <div class="card card-custom border-0 shadow-sm mb-4 trip-list">
+                        <div class="card-body p-4 trip-list">
+                        @forelse($activeTrips as $trip)
+                            <div class="card mb-3 card-custom">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-start">
+                                        <div class="position-relative d-inline-block " style="width: 180px; min-width: 180px;">
+                                            <!-- Primer círculo -->
+                                            <div class="rounded-circle circle-prim p-2 position-relative z-1" 
+                                                style="width: 100px; height: 100px;">
+                                                <div class="d-flex justify-content-center align-items-center h-100">
+                                                    <i class="bi bi-car-front text-white w-100 h-100 d-flex align-items-center justify-content-center" 
+                                                        style="font-size: 3.5rem;"></i>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Segundo círculo superpuesto -->
+                                            <div class="rounded-circle circle-sec p-2 position-absolute top-0 start-0 z-2" 
+                                                style="width: 100px; height: 100px; transform: translate(70px);">
+                                                <div class="d-flex justify-content-center align-items-center h-100">
+                                                    <i class="bi bi-person text-white w-100 h-100 d-flex align-items-center justify-content-center" 
+                                                        style="font-size: 3.5rem;"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <h5 class="fw-bold text-terr mb-1">Viaje Activo</h5>
+                                            </div>
+                                            <div class="small text-prim">
+                                                <p class="mb-1">
+                                                    <i class="bi bi-clock me-1"></i>
+                                                    Inicio: {{ $trip->start_time->format('H:i') }}
+                                                </p>
+                                                <p class="mb-1">
+                                                    <i class="bi bi-person me-1"></i>
+                                                    {{ $trip->user->name }}
+                                                </p>
+                                                <p class="mb-1">
+                                                    <i class="bi bi-truck me-1"></i>
+                                                    {{ $trip->vehicle->brand }} {{ $trip->vehicle->model }} {{ $trip->vehicle->color }}
+                                                </p>
+                                                <p class="mb-1">
+                                                    <i class="bi bi-card-text me-1"></i>
+                                                    {{ $trip->vehicle->license_plate}}
+                                                </p>
+                                                <p class="mb-1">
+                                                      <i class="bi bi-geo-alt me-1"></i>
+                                                      Ver Ubicación
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    @empty
-                        <div class="bg-white rounded-xl shadow-sm border border-neutral-200 p-8 text-center">
-                            {{-- <svg class="mx-auto h-12 w-12 text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                            </svg> --}}
-                            <p class="mt-2 text-sm text-neutral-500">No hay viajes en curso</p>
-                        </div>
-                    @endforelse
+                        @empty
+                            <div class="text-center py-4">
+                                <i class="bi bi-truck text-muted fs-2 mb-3"></i>
+                                <p class="text-muted mb-0">No hay viajes en curso</p>
+                            </div>
+                        @endforelse
+                    </div>    
                 </div>
 
-                <!-- Columna derecha: Viajes finalizados -->
-                <div class="space-y-4">
-                    <h3 class="text-lg font-semibold text-neutral-800 mb-4">Viajes Finalizados</h3>
-                    
-                    @forelse($recentLogs->take(3) as $log)
-                        <div class="bg-white rounded-xl shadow-sm border border-neutral-200 p-5">
-                            <div class="flex items-start space-x-4">
-                                <div class="bg-green-100 rounded-full p-3">
-                                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                </div>
-                                <div class="flex items-center space-x-3">
-                                    <svg class="w-10 h-10 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/>
-                                    </svg>
-                                </div>
-                                <div class="flex-1">
-                                    <div class="flex items-center justify-between">
-                                        <h4 class="text-base font-bold text-green-600">Viaje Finalizado</h4>
-                                    </div>
-                                    <p class="text-sm text-neutral-600 mt-1">Fin: {{ $log->created_at->format('H:i') }}</p>
-                                    <p class="text-sm text-neutral-600">Operador: {{ $log->user->name }}</p>
-                                    <p class="text-sm text-neutral-600">Unidad: {{ $log->vehicle->license_plate }}</p>
-                                    <div class="flex items-center mt-2 text-xs text-neutral-500">
-                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                        </svg>
-                                        ÚLTIMA LOCACIÓN, CP: 78999
+                <!-- Viajes Finalizados -->
+                <div class="card card-custom border-0 shadow-sm mb-4 trip-list">
+                        <div class="card-body p-4 trip-list">
+                        @forelse($recentLogs->take(5) as $log)
+                            <div class="card mb-3 card-custom">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-start">
+                                        <div class="position-relative d-inline-block " style="width: 180px; min-width: 180px;">
+                                            <!-- Primer círculo -->
+                                            <div class="rounded-circle circle-prim p-2 position-relative z-1" 
+                                                style="width: 100px; height: 100px;">
+                                                <div class="d-flex justify-content-center align-items-center h-100">
+                                                    <i class="bi bi-car-front text-white w-100 h-100 d-flex align-items-center justify-content-center" 
+                                                        style="font-size: 3.5rem;"></i>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Segundo círculo superpuesto -->
+                                            <div class="rounded-circle circle-sec p-2 position-absolute top-0 start-0 z-2" 
+                                                style="width: 100px; height: 100px; transform: translate(70px);">
+                                                <div class="d-flex justify-content-center align-items-center h-100">
+                                                    <i class="bi bi-person text-white w-100 h-100 d-flex align-items-center justify-content-center" 
+                                                        style="font-size: 3.5rem;"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <h5 class="fw-bold text-gr-dark mb-1">Viaje Finalizado</h5>
+                                            </div>
+                                            <div class="small text-prim">
+                                                <p class="mb-1">
+                                                    <i class="bi bi-clock me-1"></i>
+                                                    Inicio: {{ $trip->start_time->format('H:i') }}
+                                                </p>
+                                                <p class="mb-1">
+                                                    <i class="bi bi-person me-1"></i>
+                                                    {{ $trip->user->name }}
+                                                </p>
+                                                <p class="mb-1">
+                                                    <i class="bi bi-truck me-1"></i>
+                                                    {{ $trip->vehicle->brand }} {{ $trip->vehicle->model }} {{ $trip->vehicle->color }}
+                                                </p>
+                                                <p class="mb-1">
+                                                    <i class="bi bi-card-text me-1"></i>
+                                                    {{ $trip->vehicle->license_plate}}
+                                                </p>
+                                                <p class="mb-1">
+                                                      <i class="bi bi-geo-alt me-1"></i>
+                                                      Ver Ubicación
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    @empty
-                        <div class="bg-white rounded-xl shadow-sm border border-neutral-200 p-8 text-center">
-                            <p class="mt-2 text-sm text-neutral-500">No hay viajes finalizados recientes</p>
-                        </div>
-                    @endforelse
+                        @empty
+                            <div class="text-center py-4">
+                                <i class="bi bi-truck text-muted fs-2 mb-3"></i>
+                                <p class="text-muted mb-0">No hay viajes finalizados</p>
+                            </div>
+                        @endforelse
+                    </div>    
                 </div>
             </div>
 
-            <!-- Gráficos -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Gráfico de comportamiento del diesel -->
-                <div class="bg-white rounded-xl shadow-sm border border-neutral-200 p-6">
-                    <div class="mb-4">
-                        <h3 class="text-base font-bold text-white bg-green-700 px-4 py-2 rounded-t-lg -mx-6 -mt-6 mb-6">
-                            COMPORTAMIENTO DEL DIESEL
-                        </h3>
+            <div class="col-lg-8">
+                <!-- Confirmación de Viaje (si hay viaje activo) -->
+                @if($activeTrips->count() > 0)
+                    @php $trip = $activeTrips->first(); @endphp
+                    <div class="card card-custom border-0 shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <div class="d-flex align-items-start">
+                                        <div class="position-relative d-inline-block " style="width: 180px; min-width: 180px;">
+                                            <!-- Primer círculo -->
+                                            <div class="rounded-circle circle-prim p-2 position-relative z-1" 
+                                                style="width: 100px; height: 100px;">
+                                                <div class="d-flex justify-content-center align-items-center h-100">
+                                                    <i class="bi bi-car-front text-white w-100 h-100 d-flex align-items-center justify-content-center" 
+                                                        style="font-size: 3.5rem;"></i>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Segundo círculo superpuesto -->
+                                            <div class="rounded-circle circle-sec p-2 position-absolute top-0 start-0 z-2" 
+                                                style="width: 100px; height: 100px; transform: translate(70px);">
+                                                <div class="d-flex justify-content-center align-items-center h-100">
+                                                    <i class="bi bi-person text-white w-100 h-100 d-flex align-items-center justify-content-center" 
+                                                        style="font-size: 3.5rem;"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4 class="fw-bold mb-2" style="color:#AEC44C;">¿Confirma Inicio de Viaje?</h4>
+                                            <div class="row text-muted">
+                                                <div class="col-12">
+                                                    <p class="mb-2">
+                                                        <i class="bi bi-person me-2"></i>
+                                                        <strong>Operador:</strong>
+                                                        {{ $trip->user->name }}
+                                                    </p>
+                                                    <p class="mb-2">
+                                                        <i class="bi bi-truck me-2"></i>
+                                                        <strong>Unidad:</strong>
+                                                        {{ $trip->vehicle->license_plate }} {{$trip->vehicle->brand }}  {{ $trip->vehicle->model }} {{$trip->vehicle->color }}
+                                                    </p>
+                                                    <div class="d-flex">
+                                                        <p class="mb-2">
+                                                            <i class="bi bi-journal-text me-2"></i>
+                                                            <strong>Ver Bitácora</strong>
+                                                            <i class="bi bi-eye me-2"></i>
+                                                        </p>
+                                                        <small>Fecha Inicio: {{ $trip->start_time->format('d/m/Y') }}</small> 
+                                                        <small>Hora Inicio: {{ $trip->start_time->format('H:i') }}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div>
+                                        <button class="btn btn-succ">
+                                            <i class="bi bi-check me-2"></i>Aceptar
+                                        </button>
+                                        <button class="btn btn-error">
+                                            <i class="bi bi-x me-2"></i>Rechazar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="h-64 flex items-center justify-center text-neutral-400">
-                        <div class="text-center">
-                            
-                            <p class="mt-2 text-sm">Gráfico de líneas - Consumo mensual</p>
-                            <p class="text-xs text-neutral-400">2019, 2020, 2021</p>
+                @endif
+
+                <!-- Gráfico de Comportamiento del Diesel -->
+                <div class="card card-custom border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="bg-light rounded p-4" style="height: 250px;">
+                                    <div class="d-flex justify-content-center align-items-center h-100">
+                                        <div class="text-center">
+                                            <i class="bi bi-bar-chart-line fs-1 text-muted mb-3"></i>
+                                            <p class="text-muted mb-1">Gráfico de líneas - Consumo mensual</p>
+                                            <p class="text-muted small">2019, 2020, 2021</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-4">
+                                    <h6 class="fw-bold text-dark mb-3">Estadísticas</h6>
+                                    <div class="mb-3">
+                                        <p class="text-muted small mb-1">Consumo promedio</p>
+                                        <h4 class="fw-bold text-prim">15.2 L/100km</h4>
+                                    </div>
+                                    <div class="mb-3">
+                                        <p class="text-muted small mb-1">Mejor rendimiento</p>
+                                        <h4 class="fw-bold text-success">12.8 L/100km</h4>
+                                    </div>
+                                    <div class="mb-3">
+                                        <p class="text-muted small mb-1">Peor rendimiento</p>
+                                        <h4 class="fw-bold text-danger">18.5 L/100km</h4>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-               
             </div>
+            
+            <div class="col-lg-12 py-4">
+
+                <!-- Registros -->
+                <div class="card card-custom border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h4 class="fw-bold mb-2">Registros</h4>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="bg-light rounded p-4 shadow-sm mb-4">
+                                    <div class="row g-4">
+                                        <!-- Usuario -->
+                                        <div class="col-xl-3 col-lg-6">
+                                            <div class="form-group">
+                                                <label for="userSelect" class="form-label fw-semibold mb-2">
+                                                    <i class="bi bi-person me-1"></i>Usuario
+                                                </label>
+                                                <select class="form-select" id="userSelect" name="user_id">
+                                                    <option value="">Todos los usuarios</option>
+                                                    @foreach($users as $user)
+                                                        <option value="{{ $user->id }}">
+                                                            {{ $user->name }} ({{ $user->role }})
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Vehículo -->
+                                        <div class="col-xl-3 col-lg-6">
+                                            <div class="form-group">
+                                                <label for="vehicleSelect" class="form-label fw-semibold mb-2">
+                                                    <i class="bi bi-truck me-1"></i>Vehículo
+                                                </label>
+                                                <select class="form-select" id="vehicleSelect" name="vehicle_id">
+                                                    <option value="">Todos los vehículos</option>
+                                                    @foreach($vehicles as $vehicle)
+                                                        <option value="{{ $vehicle->id }}">
+                                                            {{ $vehicle->brand }} {{ $vehicle->model }} 
+                                                            <small class="text-muted">({{ $vehicle->license_plate }})</small>
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Fecha -->
+                                        <div class="col-xl-2 col-lg-6">
+                                            <div class="form-group">
+                                                <label for="dateFilter" class="form-label fw-semibold mb-2">
+                                                    <i class="bi bi-calendar me-1"></i>Fecha
+                                                </label>
+                                                <div class="input-group">
+                                                    <input type="date" class="form-control" 
+                                                        id="dateFilter" name="date"
+                                                        placeholder="Seleccionar fecha">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Tipo de Bitácora -->
+                                        <div class="col-xl-2 col-lg-6">
+                                            <div class="form-group">
+                                                <label for="logTypeSelect" class="form-label fw-semibold mb-2">
+                                                    <i class="bi bi-journal-text me-1"></i>Tipo de Bitácora
+                                                </label>
+                                                <select class="form-select" id="logTypeSelect" name="log_type">
+                                                    <option value="">Todos los tipos</option>
+                                                    <option value="mantenimiento">Mantenimiento</option>
+                                                    <option value="reparacion">Reparación</option>
+                                                    <option value="inspeccion">Inspección</option>
+                                                    <option value="combustible">Combustible</option>
+                                                    <option value="incidente">Incidente</option>
+                                                    <option value="viaje">Viaje</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Botones de Acción -->
+                                        <div class="col-xl-2 col-lg-12">
+                                            <div class="d-flex flex-column h-100">
+                                                <label class="form-label fw-semibold mb-2 invisible">Acciones</label>
+                                                <div class="d-flex gap-2 mt-auto">
+                                                    <button type="button" class="btn btn-create" id="filterBtn">
+                                                        <i class="bi bi-funnel me-2"></i>Filtrar
+                                                    </button>
+                                                    <button type="button" class="btn btn-cancel" id="clearBtn" title="Limpiar filtros">
+                                                        <i class="bi bi-x me-2"></i> Limpiar
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 py-2">
+                                <div class="bg-light rounded p-4" style="height: 250px;">
+                                    <div class="d-flex justify-content-center align-items-center h-100">
+                                        <div class="text-center">
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>   
         </div>
     </div>
 </x-app-layout>

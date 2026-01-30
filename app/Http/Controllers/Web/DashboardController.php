@@ -32,6 +32,12 @@ class DashboardController extends Controller
             ->limit(10)
             ->get();
 
-        return view('dashboard', compact('stats', 'recentLogs', 'activeTrips'));
+        $users = User::select('name', 'role')
+            ->orderBy('name')
+            ->get();
+
+        $vehicles = Vehicle::all();
+
+        return view('dashboard', compact('stats', 'recentLogs', 'activeTrips','users','vehicles'));
     }
 }

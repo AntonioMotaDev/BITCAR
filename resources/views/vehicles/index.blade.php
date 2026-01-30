@@ -23,10 +23,17 @@
                         <!-- Encabezado con avatar -->
                         <div class="d-flex align-items-start mb-4">
                             <div class="avatar-large me-4 flex-shrink-0" id="avatar-container">
+                                @if($vehicles->isEmpty())
+                                    <!-- Icono por defecto -->
+                                    <div class="avatar-small d-flex align-items-center justify-content-center w-100 h-100">
+                                        <i class="bi bi-person-fill fs-1 text-muted" style="display: none;"></i>
+                                    </div>
+                                @else
                                 <!-- Imagen del vehículo -->
                                     <img src="/storage/{{ $vehicles->first()->image }}" 
                                         alt="Avatar" 
                                         class="vehicle-image rounded-circle w-100 h-100 object-fit-cover">
+                                @endif
                                 <!-- Icono por defecto -->
                                 <div class="avatar-small d-flex align-items-center justify-content-center w-100 h-100">
                                     <i class="bi bi-person-fill fs-1 text-muted" style="display: none;"></i>
@@ -86,17 +93,18 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Botón Editar -->
-                        <div class="position-relative" style="min-height: 60px;" >
-                            <button class="btn btn-edit position-absolute bottom-0 end-0 d-flex align-items-center px-4 py-2 btn-edit-left"
-                                data-bs-toggle="modal" 
-                                data-bs-target="#editVehicleModal"
-                                title="Editar unidad">
-                                <i class="bi bi-pencil-square me-2"></i>
-                                Editar
-                            </button>
-                        </div>
+                        @if($vehicles ->isNotEmpty())
+                            <!-- Botón Editar -->
+                            <div class="position-relative" style="min-height: 60px;" >
+                                <button class="btn btn-edit position-absolute bottom-0 end-0 d-flex align-items-center px-4 py-2 btn-edit-left"
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#editVehicleModal"
+                                    title="Editar unidad">
+                                    <i class="bi bi-pencil-square me-2"></i>
+                                    Editar
+                                </button>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
@@ -114,14 +122,16 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="position-relative" style="min-height: 60px;">
-                            <button href="#" class="btn btn-edit position-absolute bottom-0 end-0 d-flex align-items-center px-4 py-2 btn-upload-left"
-                                data-bs-toggle="modal" 
-                                data-bs-target="#uploadDocumentVhModal"
-                                title="Subir Documento">
-                                <i class="bi bi-upload me-2"></i> Subir  
-                            </button>
-                        </div>
+                        @if($vehicles->isNotEmpty())
+                            <div class="position-relative" style="min-height: 60px;">
+                                <button href="#" class="btn btn-edit position-absolute bottom-0 end-0 d-flex align-items-center px-4 py-2 btn-upload-left"
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#uploadDocumentVhModal"
+                                    title="Subir Documento">
+                                    <i class="bi bi-upload me-2"></i> Subir  
+                                </button>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -145,6 +155,9 @@
                             <div class="col-12 py-4">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h2 class="h3 fw-bold text-secondary mb-0">Unidades Registradas</h2>
+                                    <button class="btn btn-i" data-bs-toggle="modal" data-bs-target="#assignVehicleModal">
+                                        <i class="bi bi-person"></i> Asignar Unidad
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -164,70 +177,81 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($vehicles as $vehicle)
-                                        <tr class="vehicle-row {{ $loop->first ? 'active' : '' }}"
-                                            data-vehicle-id="{{ $vehicle->id }}"
-                                            data-vehicle-brand="{{ $vehicle->brand }}"
-                                            data-vehicle-model="{{ $vehicle->model }}"
-                                            data-vehicle-color="{{ $vehicle->color }}"
-                                            data-vehicle-type="{{ $vehicle->type }}"
-                                            data-vehicle-year="{{ $vehicle->year }}"
-                                            data-vehicle-mileage="{{ $vehicle->mileage }}"
-                                            data-vehicle-fuel-capacity="{{ $vehicle->fuel_capacity }}"
-                                            data-vehicle-license-plate="{{ $vehicle->license_plate }}"
-                                            data-vehicle-vin="{{ $vehicle->vin }}"
-                                            data-vehicle-status="{{ $vehicle->status }}"
-                                            data-vehicle-image="{{ $vehicle->image }}"
-                                            data-vehicle-documents='@json($vehicle->vehicleDocuments ?? [])'>
-                                            
-                                            <td class="ps-3">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar-small bg-primary bg-opacity-10 me-3">
-                                                        <i class="bi bi-car-front text-prim"></i>
+                                        @if($vehicles->isEmpty())
+                                            <tr>
+                                                <td colspan="6" class="text-center py-4">
+                                                    <div class="d-flex flex-column align-items-center">
+                                                        <i class="bi bi-car-front fs-1 text-muted mb-2"></i>
+                                                        <p class="text-muted mb-0">No hay unidades registradas</p>
                                                     </div>
-                                                    <div>
-                                                        <h3 class="h6 fw-bold mb-0 info-header">{{ $vehicle->brand }}</h3>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>{{ $vehicle->model }}</td>
-                                            <td>{{ $vehicle->type }}</td>
-                                            <td>{{ $vehicle->year }}</td>
-                                            <td>{{ $vehicle->license_plate }}                                  </td>
-                                            <td class="text-end pe-3">
-                                                <div class="d-flex gap-2 justify-content-end">
-                                                    <button class="btn btn-eye btn-view-vehicle" 
-                                                            data-vehicle-id="{{ $vehicle->id }}"
-                                                            title="Ver detalles">
-                                                        <i class="bi bi-eye"></i> Ver
-                                                    </button>
-                                                    <button class="btn btn-edit"
-                                                            data-bs-toggle="modal" 
-                                                            data-bs-target="#editVehicleModal"
-                                                            data-vehicle-id="{{ $vehicle->id }}"
-                                                            data-vehicle-brand="{{ $vehicle->brand }}"
-                                                            data-vehicle-model="{{ $vehicle->model }}"
-                                                            data-vehicle-year="{{ $vehicle->year }}"
-                                                            data-vehicle-color="{{ $vehicle->color }}"
-                                                            data-vehicle-fuel-capacity="{{ $vehicle->fuel_capacity }}"
-                                                            data-vehicle-license-plate="{{ $vehicle->license_plate }}"
-                                                            data-vehicle-vin="{{ $vehicle->vin }}"
-                                                            data-vehicle-mileage="{{ $vehicle->mileage }}"
-                                                            data-vehicle-type="{{ $vehicle->type }}"
-                                                            data-vehicle-status="{{ $vehicle->status }}"
-                                                            data-vehicle-image="/storage/{{ $vehicle->image }}"
-                                                            title="Editar unidad">
-                                                        <i class="bi bi-pencil-square"></i> Editar
-                                                    </button>
-                                                    <button class="btn btn-delete" 
-                                                            data-vehicle-id="{{ $vehicle->id }}"
-                                                            title="Eliminar unidad">
-                                                        <i class="bi bi-trash"></i> Eliminar
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        @endforeach
+                                                </td>
+                                            </tr>
+                                        @else
+                                                @foreach($vehicles as $vehicle)
+                                                    <tr class="vehicle-row {{ $loop->first ? 'active' : '' }}"
+                                                        data-vehicle-id="{{ $vehicle->id }}"
+                                                        data-vehicle-brand="{{ $vehicle->brand }}"
+                                                        data-vehicle-model="{{ $vehicle->model }}"
+                                                        data-vehicle-color="{{ $vehicle->color }}"
+                                                        data-vehicle-type="{{ $vehicle->type }}"
+                                                        data-vehicle-year="{{ $vehicle->year }}"
+                                                        data-vehicle-mileage="{{ $vehicle->mileage }}"
+                                                        data-vehicle-fuel-capacity="{{ $vehicle->fuel_capacity }}"
+                                                        data-vehicle-license-plate="{{ $vehicle->license_plate }}"
+                                                        data-vehicle-vin="{{ $vehicle->vin }}"
+                                                        data-vehicle-status="{{ $vehicle->status }}"
+                                                        data-vehicle-image="{{ $vehicle->image }}"
+                                                        data-vehicle-documents='@json($vehicle->vehicleDocuments ?? [])'>
+                                                        
+                                                        <td class="ps-3">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="avatar-small bg-primary bg-opacity-10 me-3">
+                                                                    <i class="bi bi-car-front text-prim"></i>
+                                                                </div>
+                                                                <div>
+                                                                    <h3 class="h6 fw-bold mb-0 info-header">{{ $vehicle->brand }}</h3>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>{{ $vehicle->model }}</td>
+                                                        <td>{{ $vehicle->type }}</td>
+                                                        <td>{{ $vehicle->year }}</td>
+                                                        <td>{{ $vehicle->license_plate }}                                  </td>
+                                                        <td class="text-end pe-3">
+                                                            <div class="d-flex gap-2 justify-content-end">
+                                                                <button class="btn btn-eye btn-view-vehicle" 
+                                                                        data-vehicle-id="{{ $vehicle->id }}"
+                                                                        title="Ver detalles">
+                                                                    <i class="bi bi-eye"></i> Ver
+                                                                </button>
+                                                                <button class="btn btn-edit"
+                                                                        data-bs-toggle="modal" 
+                                                                        data-bs-target="#editVehicleModal"
+                                                                        data-vehicle-id="{{ $vehicle->id }}"
+                                                                        data-vehicle-brand="{{ $vehicle->brand }}"
+                                                                        data-vehicle-model="{{ $vehicle->model }}"
+                                                                        data-vehicle-year="{{ $vehicle->year }}"
+                                                                        data-vehicle-color="{{ $vehicle->color }}"
+                                                                        data-vehicle-fuel-capacity="{{ $vehicle->fuel_capacity }}"
+                                                                        data-vehicle-license-plate="{{ $vehicle->license_plate }}"
+                                                                        data-vehicle-vin="{{ $vehicle->vin }}"
+                                                                        data-vehicle-mileage="{{ $vehicle->mileage }}"
+                                                                        data-vehicle-type="{{ $vehicle->type }}"
+                                                                        data-vehicle-status="{{ $vehicle->status }}"
+                                                                        data-vehicle-image="/storage/{{ $vehicle->image }}"
+                                                                        title="Editar unidad">
+                                                                    <i class="bi bi-pencil-square"></i> Editar
+                                                                </button>
+                                                                <button class="btn btn-delete" 
+                                                                        data-vehicle-id="{{ $vehicle->id }}"
+                                                                        title="Eliminar unidad">
+                                                                    <i class="bi bi-trash"></i> Eliminar
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                        @endif
                                     </tbody>
                                 </table>
                             </div>
@@ -245,6 +269,7 @@
     @include('vehicles.create-modal')
     @include('vehicles.edit-modal')
     @include('documents.upload-file-vh-modal')
+    @include('vehicles.assignment-modal')
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

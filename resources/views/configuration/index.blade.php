@@ -36,7 +36,7 @@
 
                         <!-- Información básica -->
                         <div class="row g-3 mb-4">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <p class="info-label mb-1">Estado</p>
                                 @if($checklists->isNotEmpty())
                                     <span class="checklist-status-badge badge 
@@ -53,11 +53,35 @@
                                     </span>
                                 @endif
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <p class="info-label mb-1">Fecha Creación</p>
                                 <p class="info-value mb-0 checklist-created-at">
                                     @if($checklists->isNotEmpty())
                                         {{ $checklists->first()->created_at->format('d/m/Y') }}
+                                    @else
+                                        N/A
+                                    @endif
+                                </p>
+                            </div>
+                            <div class="col-md-4">
+                                <p class="info-label mb-1">Tipo</p>
+                                <p class="info-value mb-0 checklist-type">
+                                    @if($checklists->isNotEmpty())
+                                        @php
+                                            $typeLabels = [
+                                                'entry' => 'Entrada',
+                                                'exit' => 'Salida',
+                                                'trip_start' => 'Inicio de viaje',
+                                                'trip_checkpoint' => 'Punto en el viaje',
+                                                'trip_end' => 'Fin de viaje',
+                                                'fuel' => 'Combustible',
+                                                'incident' => 'Incidente',
+                                                'maintenance' => 'Mantenimiento', 
+                                                'other' => 'Otro'
+                                            ];
+                                            
+                                            echo $typeLabels[$checklists->first()->type] ?? $checklists->first()->type;
+                                        @endphp
                                     @else
                                         N/A
                                     @endif
@@ -118,18 +142,21 @@
                                     $itemsForButton = json_encode($itemsArray);
                                 }
                             @endphp
-                            <button class="btn btn-edit d-flex justify-content-center px-4 py-2 edit-checklist-btn"
+                            @if($checklists->isNotEmpty())
+                                <button class="btn btn-edit d-flex justify-content-center px-4 py-2 edit-checklist-btn"
                                     id="editChecklistBtn"
                                     data-checklist-id="{{ $firstChecklist->id ?? '' }}"
                                     data-checklist-name="{{ $firstChecklist->name ?? '' }}"
                                     data-checklist-description="{{ $firstChecklist->description ?? '' }}"
                                     data-checklist-status="{{ $firstChecklist->is_active ?? '' }}"
+                                    data-checklist-type="{{ $firstChecklist->type ?? ''}}"
                                     data-checklist-items="{{ $itemsForButton }}"
                                     data-bs-toggle="modal" 
                                     data-bs-target="#editChecklistModal">
-                                <i class="bi bi-pencil-square me-2"></i>
-                                Editar
-                            </button>
+                                    <i class="bi bi-pencil-square me-2"></i>
+                                    Editar
+                                </button>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -159,107 +186,138 @@
                 <div class="card card-custom border-0 shadow-sm h-90">
                     <div class="card-body p-4 d-flex flex-column">
                         <!-- Contenedor horizontal con scroll ajustado -->
-                        <div class="flex-grow-1">
-                            <div class="checklists-horizontal-container">
+                        <div class="flex-grow-1 d-flex flex-column">
+                            <div class="checklists-horizontal-container felx-group-1 d-flex align-items-center justify-content-center">
                                 <div class="checklists-scroll-wrapper" id="checklistsContainer">
                                     <!-- Cards de Checklists -->
-                                    @foreach($checklists as $checklist)
-                                        @php
-                                            // Preparar los items para JSON
-                                            $itemsData = $checklist->checklistItems->map(function($item) {
-                                                return [
-                                                    'id' => $item->id,
-                                                    'label' => $item->label ?? $item->name,
-                                                    'name' => $item->name,
-                                                    'type' => $item->type,
-                                                    'description' => $item->description,
-                                                    'options' => $item->options,
-                                                    'order' => $item->order,
-                                                    'required' => $item->required,
-                                                    'created_at' => $item->created_at,
-                                                    'updated_at' => $item->updated_at,
-                                                ];
-                                            });
-                                        @endphp
-                                        
-                                        <div class="checklist-card @if($loop->first) active @endif" 
-                                             data-checklist-id="{{ $checklist->id }}"
-                                             data-checklist-name="{{ $checklist->name }}"
-                                             data-checklist-description="{{ $checklist->description }}"
-                                             data-checklist-status="{{ $checklist->is_active }}"
-                                             data-checklist-created-at="{{ $checklist->created_at->format('d/m/Y') }}"
-                                             data-checklist-items="{{ $itemsData->toJson() }}">
-                                            <div class="card-body d-flex flex-column">
-                                                <!-- Header -->
-                                                <div class="mb-3">
-                                                    <div class="d-flex align-items-center mb-2">
-                                                        <div class="checklist-icon bg-primary bg-opacity-10 me-3">
-                                                            <i class="bi bi-clipboard-check text-prim"></i>
-                                                        </div>
-                                                        <div>
-                                                            <h5 class="h5 fw-bold text-prim mb-0">{{ $checklist->name }}</h5>
-                                                            <div class="d-flex align-items-center mt-1">
-                                                                <span class="badge 
-                                                                    @if($checklist->is_active == 1)
-                                                                        bg-success bg-opacity-10 text-success
-                                                                    @else
-                                                                        bg-danger bg-opacity-10 text-danger
-                                                                    @endif
-                                                                    border 
-                                                                    @if($checklist->is_active == 1)
-                                                                        border-success border-opacity-25
-                                                                    @else
-                                                                        border-danger border-opacity-25
-                                                                    @endif small">
-                                                                    {{ $checklist->is_active == 1 ? 'Activo' : 'Inactivo' }}
-                                                                </span>
-                                                                <span class="text-prim small ms-2">
-                                                                    <i class="bi bi-calendar me-1"></i>
-                                                                    {{ $checklist->created_at->format('d/m/Y') }}
-                                                                </span>
+                                     @if($checklists->isEmpty())
+                                        <div class="text-center py-4">
+                                            <i class="bi bi-clipboard-x fs-1 text-muted"></i>
+                                            <p class="text-muted small mt-2">No hay bitácoras creadas aún</p>
+                                        </div>
+                                    @else
+                                        @foreach($checklists as $checklist)
+                                            @php
+                                                // Preparar los items para JSON
+                                                $itemsData = $checklist->checklistItems->map(function($item) {
+                                                    return [
+                                                        'id' => $item->id,
+                                                        'label' => $item->label ?? $item->name,
+                                                        'name' => $item->name,
+                                                        'type' => $item->type,
+                                                        'description' => $item->description,
+                                                        'options' => $item->options,
+                                                        'order' => $item->order,
+                                                        'required' => $item->required,
+                                                        'created_at' => $item->created_at,
+                                                        'updated_at' => $item->updated_at,
+                                                    ];
+                                                });
+                                            @endphp
+                                            
+                                            <div class="checklist-card @if($loop->first) active @endif" 
+                                                data-checklist-id="{{ $checklist->id }}"
+                                                data-checklist-name="{{ $checklist->name }}"
+                                                data-checklist-description="{{ $checklist->description }}"
+                                                data-checklist-status="{{ $checklist->is_active }}"
+                                                data-checklist-type="{{ $checklist->type }}"
+                                                data-checklist-created-at="{{ $checklist->created_at->format('d/m/Y') }}"
+                                                data-checklist-items="{{ $itemsData->toJson() }}">
+                                                <div class="card-body d-flex flex-column">
+                                                    <!-- Header -->
+                                                    <div class="mb-3">
+                                                        <div class="d-flex align-items-center mb-2">
+                                                            <div class="checklist-icon bg-primary bg-opacity-10 me-3">
+                                                                <i class="bi bi-clipboard-check text-prim"></i>
+                                                            </div>
+                                                            <div>
+                                                                <h5 class="h5 fw-bold text-prim mb-0">{{ $checklist->name }}</h5>
+                                                                <div class="d-flex align-items-center mt-1">
+                                                                    <span class="badge 
+                                                                        @if($checklist->is_active == 1)
+                                                                            bg-success bg-opacity-10 text-success
+                                                                        @else
+                                                                            bg-danger bg-opacity-10 text-danger
+                                                                        @endif
+                                                                        border 
+                                                                        @if($checklist->is_active == 1)
+                                                                            border-success border-opacity-25
+                                                                        @else
+                                                                            border-danger border-opacity-25
+                                                                        @endif small">
+                                                                        {{ $checklist->is_active == 1 ? 'Activo' : 'Inactivo' }}
+                                                                    </span>
+                                                                    <span class="text-prim small ms-2">
+                                                                        <i class="bi bi-calendar me-1"></i>
+                                                                        {{ $checklist->created_at->format('d/m/Y') }}
+                                                                    </span>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                
-                                                <!-- Descripción -->
-                                                <div class="mb-3">
-                                                    <p class="small text-prim checklist-description-preview">
-                                                        {{ Str::limit($checklist->description, 100) }}
-                                                    </p>
-                                                </div>
-                                                
-                                                <!-- Items count -->
-                                                <div class="mb-3">
-                                                    <div class="d-flex align-items-center">
-                                                        <i class="bi bi-list-check text-primary me-2"></i>
-                                                        <span class="fw-medium small">{{ $checklist->checklistItems->count() }} items</span>
+
+                                                    <!-- Tipo -->
+                                                    <div class="mb-3">
+                                                        <p class="small text-prim checklist-type">
+                                                            <i class="bi bi-tag me-1"></i>
+                                                            @php
+                                                                $typeLabels = [
+                                                                    'entry' => 'Entrada',
+                                                                    'exit' => 'Salida',
+                                                                    'trip_start' => 'Inicio de viaje',
+                                                                    'trip_checkpoint' => 'Punto en el viaje',
+                                                                    'trip_end' => 'Fin de viaje',
+                                                                    'fuel' => 'Combustible',
+                                                                    'incident' => 'Incidente',
+                                                                    'maintenance' => 'Mantenimiento', 
+                                                                    'other' => 'Otro'
+                                                                ];
+                                                                
+                                                                echo $typeLabels[$checklist->type] ?? $checklist->type;
+                                                            @endphp
+                                                        </p>
                                                     </div>
-                                                </div>
-                                                
-                                                
-                                                
-                                                <!-- Botones -->
-                                                <div class="mt-auto pt-3 border-top">
-                                                    <div class="d-flex gap-2">
-                                                        <button class="btn btn-eye btn-view-checklist flex-grow-1"
-                                                                data-checklist-id="{{ $checklist->id }}">
-                                                            <i class="bi bi-eye me-1"></i> Ver
-                                                        </button>
-                                                        <button class="btn btn-edit flex-grow-1 edit-checklist-btn"
-                                                                data-checklist-id="{{ $checklist->id }}"
-                                                                data-checklist-name="{{ $checklist->name }}"
-                                                                data-checklist-description="{{ $checklist->description }}"
-                                                                data-checklist-status="{{ $checklist->is_active }}"
-                                                                data-bs-toggle="modal" 
-                                                                data-bs-target="#editChecklistModal">
-                                                            <i class="bi bi-pencil-square me-1"></i> Editar
-                                                        </button>
+                                                    
+                                                    <!-- Descripción -->
+                                                    <div class="mb-3">
+                                                        <p class="small text-prim checklist-description-preview">
+                                                            {{ Str::limit($checklist->description, 100) }}
+                                                        </p>
+                                                    </div>
+                                                    
+                                                    <!-- Items count -->
+                                                    <div class="mb-3">
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="bi bi-list-check text-primary me-2"></i>
+                                                            <span class="fw-medium small">{{ $checklist->checklistItems->count() }} items</span>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    
+                                                    
+                                                    <!-- Botones -->
+                                                    <div class="mt-auto pt-3 border-top">
+                                                        <div class="d-flex gap-2">
+                                                            <button class="btn btn-eye btn-view-checklist flex-grow-1"
+                                                                    data-checklist-id="{{ $checklist->id }}">
+                                                                <i class="bi bi-eye me-1"></i> Ver
+                                                            </button>
+                                                            <button class="btn btn-edit flex-grow-1 edit-checklist-btn"
+                                                                    data-checklist-id="{{ $checklist->id }}"
+                                                                    data-checklist-name="{{ $checklist->name }}"
+                                                                    data-checklist-description="{{ $checklist->description }}"
+                                                                    data-checklist-status="{{ $checklist->is_active }}"
+                                                                    data-checklist-type="{{ $checklist->type }}"
+                                                                    data-bs-toggle="modal" 
+                                                                    data-bs-target="#editChecklistModal">
+                                                                <i class="bi bi-pencil-square me-1"></i> Editar
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    @endforeach
+                                        @endforeach
+                                    @endif
                                 </div>
                             </div>
                             
@@ -280,10 +338,11 @@
             </div>
         </div>
     </div>
-    
     @include('configuration.checklist-create-modal')
-    @include('configuration.checklist-edit-modal')
-    
+    @if($checklists->isNotEmpty())
+        @include('configuration.checklist-edit-modal')
+    @endif
+  
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -293,14 +352,17 @@
             const checklistName = checklistCard.getAttribute('data-checklist-name');
             const checklistDescription = checklistCard.getAttribute('data-checklist-description');
             const checklistStatus = checklistCard.getAttribute('data-checklist-status');
+            const checklistType = checklistCard.getAttribute('data-checklist-type');
             const checklistCreatedAt = checklistCard.getAttribute('data-checklist-created-at');
             const checklistItems = JSON.parse(checklistCard.getAttribute('data-checklist-items') || '[]');
+            const type = getTypeLabel(checklistType);
             
             // Actualizar información principal en el panel izquierdo
             document.querySelector('.checklist-name').textContent = checklistName;
             document.querySelector('.checklist-id').textContent = `ID: ${checklistId}`;
             document.querySelector('.checklist-description').textContent = checklistDescription || 'Sin descripción';
             document.querySelector('.checklist-created-at').textContent = checklistCreatedAt;
+            document.querySelector('.checklist-type').textContent = type;
             
             // Actualizar estado con badge
             const statusBadge = document.querySelector('.checklist-status-badge');
@@ -321,10 +383,27 @@
             editBtn.setAttribute('data-checklist-name', checklistName);
             editBtn.setAttribute('data-checklist-description', checklistDescription);
             editBtn.setAttribute('data-checklist-status', checklistStatus);
+            editBtn.setAttribute('data-checklist-type', checklistType);
             
             // Resaltar card activa
             highlightActiveCard(checklistId);
         }
+
+        function getTypeLabel(type) {
+            const typeLabels = {
+                'entry': 'Entrada',
+                'exit': 'Salida',
+                'trip_start': 'Inicio de viaje',
+                'trip_checkpoint': 'Punto en el viaje',
+                'trip_end': 'Fin de viaje',
+                'fuel': 'Combustible',
+                'incident': 'Incidente',
+                'maintenance': 'Mantenimiento', 
+                'other': 'Otro'
+            };
+             return typeLabels[type] || type; 
+        }
+
         // Actualizar la información en la card de la izquierda
         function updateChecklistItems(items) {
             const container = document.querySelector('.checklist-items-container');

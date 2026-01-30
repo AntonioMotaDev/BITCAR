@@ -25,6 +25,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('can:viewAny,App\Models\Vehicle')->group(function () {
         Route::resource('vehicles', VehicleController::class);
         Route::post('vehicles/documents/upload', [VehicleController::class, 'uploadDocument'])->name('vehicles.documents.store');
+        Route::post('vehicles/assignment/store', [VehicleController::class, 'storeAssignment'])->name('vehicles.assignment.store');
     });
 
     // Users - Solo admin

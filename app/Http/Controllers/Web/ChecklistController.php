@@ -47,8 +47,20 @@ class ChecklistController extends Controller
             'photo' => ['label' => 'Foto'],
             'signature' => ['label' => 'Firma'],
         ];
+
+        $typeChecklistOptions = [
+                'entry' => ['label' => 'Entrada'],
+                'exit' => ['label' => 'Salida'],
+                'trip_start' => ['label' => 'Inicio de viaje'],
+                'trip_checkpoint' => ['label' => 'Punto en el viaje'],
+                'trip_end' => ['label' => 'Fin de viaje'],
+                'fuel' => ['label' => 'Combustible'],
+                'incident' => ['label' => 'Incidente'],
+                'maintenance' => ['label' => 'Mantenimiento'], 
+                'other' => ['label' => 'Otro']
+        ];
         
-        return view('configuration.index', compact('checklists','typeOptions'));
+        return view('configuration.index', compact('checklists','typeOptions','typeChecklistOptions'));
     }
 
     public function create(): View
@@ -66,6 +78,7 @@ class ChecklistController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'items' => 'required|string', // Los items como JSON string
+            'checklist_type' => 'required|in:entry,exit,trip_start,trip_checkpoint,trip_end,fuel,incident,maintenance,other'
         ], [
             'name.required' => 'El nombre de la bitácora es obligatorio.',
             'name.max' => 'El nombre no puede exceder los 255 caracteres.',
@@ -120,6 +133,7 @@ class ChecklistController extends Controller
                     'name' => $validated['name'],
                     'description' => $validated['description'],
                     'is_active' => true,
+                    'type' => $validated['checklist_type'],
                 ]);
                 
                 // Crear los items del checklist
@@ -187,6 +201,7 @@ class ChecklistController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
+            'edit_checklist_type' => 'required|in:entry,exit,trip_start,trip_checkpoint,trip_end,fuel,incident,maintenance,other',
             'items' => 'required|string', // Los items como JSON string
         ], [
             'name.required' => 'El nombre de la bitácora es obligatorio.',
@@ -243,6 +258,7 @@ class ChecklistController extends Controller
                     'is_active' => $request->has('is_active') ? 
                         filter_var($request->is_active, FILTER_VALIDATE_BOOLEAN) : 
                         $checklist->is_active,
+                    'type' => $validated['edit_checklist_type'],
                 ]);
                 
                 // Eliminar los items existentes

@@ -109,7 +109,7 @@
                                         required>
                                     <option value="" disabled selected>Selecciona un rol</option>
                                     @foreach($roleOptions as $value => $data)
-                                        <option value="{{ $value }}" {{ $user->role == $value ? 'selected' : '' }}>
+                                        <option value="{{ $value }}" {{ old('role') == $value ? 'selected' : '' }}>
                                              {{ $data['label'] }}
                                         </option>
                                     @endforeach
@@ -129,10 +129,10 @@
                                         name="status" 
                                         required>
                                     <option value="" disabled selected>Selecciona un estado</option>
-                                    <option value="active" {{ $user->status == 'active' ? 'selected' : '' }}>
+                                    <option value="active"  {{ old('status') == 'active' ? 'selected' : '' }}>
                                         Activo
                                     </option>
-                                    <option value="inactive" {{ $user->status == 'inactive' ? 'selected' : '' }}>
+                                    <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>
                                         Inactivo
                                     </option>
                                 </select>

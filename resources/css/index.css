@@ -199,4 +199,9 @@
     font-size: 0.85rem;
     color: #212529;
 }
+
+.trip-list{
+    max-height: 400px;
+    overflow-y: auto;
+}
    

@@ -7,6 +7,8 @@ use App\Http\Requests\StoreVehicleRequest;
 use App\Http\Requests\UpdateVehicleRequest;
 use App\Models\Vehicle;
 use App\Models\Document;
+use App\Models\User;
+use App\Models\VehicleAssignment;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -19,6 +21,8 @@ class VehicleController extends Controller
     public function index(): View
     {
         $this->authorize('viewAny', Vehicle::class);
+
+        $users = User:: all();
 
         $vehicles = Vehicle::latest()
         ->with(['vehicleDocuments' => function ($query) {
@@ -42,7 +46,7 @@ class VehicleController extends Controller
             'camión' => ['label' => 'Camión']
         ];
 
-        return view('vehicles.index', compact('vehicles','typeOptions'));
+        return view('vehicles.index', compact('vehicles','typeOptions','users'));
     }
 
     public function create(): View
@@ -243,6 +247,32 @@ class VehicleController extends Controller
             return redirect()->route('vehicles.index')
                 ->with('error', 'Error al subir el documento: ' . $e->getMessage());
         }
+    }
+
+    public function storeAssignment(Request $request){
+        
+        try{
+            $validated = $request->validate([
+                'vehicle_id' => 'required|exists:vehicles,id',
+                'user_id' => 'required|exists:users,id',
+                'start_date' => 'required|date',
+                'end_date' => 'nullable|date|after_or_equal:start_date',
+            ]); 
+
+            VehicleAssignment::create([
+                'vehicle_id' => $validated['vehicle_id'],
+                'user_id' => $validated['user_id'],
+                'start_date' => $validated['start_date'],
+                'end_date' => $validated['end_date'] ?? null,
+            ]);
+
+            return redirect()->back()
+                ->with('success', 'Unidad asignada correctamente.');
+        
+        } catch(\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error al asignar la unidad: ' . $e->getMessage());
+        }   
     }
 
     public function destroy(Vehicle $vehicle): RedirectResponse

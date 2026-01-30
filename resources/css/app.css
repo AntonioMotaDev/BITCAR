@@ -178,5 +178,34 @@ body {
     color: var(--color-text-light),
 }
 
+.text-terr{
+    color: var(--color-terracota) !important;
+}
+
+.text-gr-dark{
+    color: var(--color-dark-green);
+}
+
+.circle-prim{
+    background-color: var(--color-light-blue);
+}
+
+.circle-sec{
+    background-color: var(--color-median-blue);
+}
+
+.btn-error{
+    background-color: var(--color-error);
+    border-radius: 15px;
+    color: white;
+}
+
+.btn-succ{
+    background-color: var(--color-success);
+    border-radius: 15px;
+    color: white;
+}
+
+
         
 
