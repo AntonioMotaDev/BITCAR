@@ -18,7 +18,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
 
         // Checklists
-        Route::get('/checklists/active', [ChecklistController::class, 'active']);
+        Route::get('/checklists', [ChecklistController::class, 'active']);
         Route::get('/checklists/{checklist_type}', [ChecklistController::class, 'showByType']);
         Route::post('/checklists/{checklist}/submit', [ChecklistController::class, 'submit']);
 
@@ -29,7 +29,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/vehicle-logs/{log}/photos', [VehicleLogController::class, 'storePhotos']);
         Route::post('/vehicle-logs/{log}/fuel-load', [VehicleLogController::class, 'storeFuelLoad']);
 
-        // Trips
+        // Trips    
         Route::get('/trips', [TripController::class, 'index']);
         Route::post('/trips', [TripController::class, 'store']);
         Route::get('/trips/active', [TripController::class, 'active']);

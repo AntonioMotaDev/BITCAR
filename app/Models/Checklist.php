@@ -19,7 +19,7 @@ class Checklist extends Model
     ];
 
     // Relaciones
-    public function checklistItems(): HasMany
+    public function items(): HasMany
     {
         return $this->hasMany(ChecklistItem::class)->orderBy('order');
     }
