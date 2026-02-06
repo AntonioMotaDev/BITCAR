@@ -75,6 +75,11 @@ class User extends Authenticatable
         return $this->hasMany(Trip::class);
     }
 
+     public function userDocuments(): HasMany
+    {
+        return $this->hasMany(Document::class);
+    }
+
     // Helpers
     public function isAdmin(): bool
     {

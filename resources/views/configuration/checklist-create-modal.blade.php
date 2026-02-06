@@ -50,6 +50,24 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+
+                            <!-- Tipo de la Bitácora -->
+                            <div class="mb-4">
+                                <label for="checklist_type" class="form-label text-prim">
+                                    <i class="bi bi-toggle-on me-1"></i>Tipo *
+                                </label>
+                                <select class="form-select form-select-sm @error('checklist_type') is-invalid @enderror" id="checklist_type" name="checklist_type" required>
+                                    <option value="" disabled selected>Selecciona un tipo</option>
+                                        @foreach($typeChecklistOptions as $value => $data)
+                                            <option value="{{ $value }}">
+                                                {{ $data['label'] }}
+                                            </option>
+                                        @endforeach
+                                </select>
+                                @error('checklist_type')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
                             
                             <!-- Sección para agregar items -->
                             <div class="card border-0 shadow-sm mb-4">

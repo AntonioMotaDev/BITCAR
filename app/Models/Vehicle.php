@@ -42,4 +42,9 @@ class Vehicle extends Model
     {
         return $this->hasMany(Trip::class);
     }
+
+     public function vehicleDocuments(): HasMany
+    {
+        return $this->hasMany(Document::class);
+    }
 }

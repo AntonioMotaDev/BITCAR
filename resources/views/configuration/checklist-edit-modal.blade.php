@@ -45,6 +45,24 @@
                                           placeholder="Describe el propósito de esta bitácora..."
                                           required></textarea>
                             </div>
+
+                            <!-- Tipo de la Bitácora -->
+                            <div class="mb-4">
+                                <label for="edit_checklist_type" class="form-label text-prim">
+                                    <i class="bi bi-toggle-on me-1"></i>Tipo *
+                                </label>
+                                <select class="form-select @error('edit_checklist_type') is-invalid @enderror" id="edit_checklist_type" name="edit_checklist_type" required>
+                                    <option value="" disabled selected>Selecciona un tipo</option>
+                                        @foreach($typeChecklistOptions as $value => $data)
+                                            <option value="{{ $value }}">
+                                                {{ $data['label'] }}
+                                            </option>
+                                        @endforeach
+                                </select>
+                                @error('edit_checklist_type')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
                             
                             <!-- Estado de la Bitácora -->
                             <div class="mb-4">
@@ -180,6 +198,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const editChecklistIdInput = document.getElementById('edit_checklist_id');
     const editChecklistName = document.getElementById('edit_checklist_name');
     const editChecklistDescription = document.getElementById('edit_checklist_description');
+    const editChecklistType = document.getElementById('edit_checklist_type');
     const editChecklistStatus = document.getElementById('edit_checklist_status');
     const editItemsJsonInput = document.getElementById('editItemsJson');
     
@@ -391,6 +410,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const checklistName = this.getAttribute('data-checklist-name');
             const checklistDescription = this.getAttribute('data-checklist-description');
             const checklistStatus = this.getAttribute('data-checklist-status');
+            const checklistType = this.getAttribute('data-checklist-type');
             
             // Obtener items de la card
             const checklistCard = document.querySelector(`.checklist-card[data-checklist-id="${checklistId}"]`);
@@ -410,6 +430,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (editChecklistName) editChecklistName.value = checklistName || '';
             if (editChecklistDescription) editChecklistDescription.value = checklistDescription || '';
             if (editChecklistStatus) editChecklistStatus.value = checklistStatus === '1' ? '1' : '0';
+            if (editChecklistType) editChecklistType.value = checklistType || '';
             if (editChecklistForm) editChecklistForm.action = `/checklists/${checklistId}`;
             
             // Cargar items

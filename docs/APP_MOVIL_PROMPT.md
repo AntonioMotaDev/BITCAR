@@ -44,6 +44,81 @@
 
 ---
 
+## 🧠 REGLAS GENERALES DE DESARROLLO (OBLIGATORIAS)
+
+1. Usar TypeScript estrictamente (no `any`)
+2. No implementar features fuera del scope del MVP
+3. Priorizar rendimiento y bajo consumo de batería
+4. Evitar re-renderizados innecesarios
+5. Toda lógica de negocio vive fuera de componentes UI
+6. No acoplar lógica de API directamente en screens
+7. Usar hooks personalizados para GPS, cámara y offline
+8. Manejar errores de red de forma resiliente
+9. Pensar primero en Android gama media–baja
+10. El backend es la única fuente de verdad
+
+---
+
+## 📡 OFFLINE MODE (SIMPLIFICADO)
+
+- Guardar checklists y eventos localmente
+- No sincronizar GPS offline
+- Reintentar sync al recuperar conexión
+- Mostrar estado: Pendiente / Enviado
+- No bloquear al operador por falta de red
+
+---
+
+## 🎯 ALCANCE MVP (IMPORTANTE)
+
+Incluido en MVP:
+- Login / Logout
+- Checklist entrada/salida
+- Inicio y fin de viaje
+- Tracking GPS en foreground
+- Registro de combustible
+- Registro de incidentes
+- Subida de fotos
+- Firma digital
+
+NO incluido en MVP:
+- Background tracking persistente
+- Push notifications
+- Dark mode
+- OBD2
+- Analytics avanzados
+- Reportes PDF
+
+---
+
+## 📍 REGLAS DE TRACKING GPS (CRÍTICO)
+
+- Usar solo foreground location tracking
+- Intervalo mínimo: 30 segundos
+- Enviar datos en batch cada 5–10 puntos
+- Detener tracking si:
+  - accuracy > 100m
+  - velocidad = 0 por más de 5 minutos
+- NO usar background services en MVP
+- Pausar tracking cuando la app esté en background
+- Priorizar battery efficiency sobre precisión extrema
+
+---
+
+## 🏗️ MANEJO DE ESTADO
+
+- AuthContext:
+  - token
+  - user
+- TripContext:
+  - trip activo
+  - buffer de locations
+- Todo lo demás:
+  - Zustand stores
+  - Hooks locales
+
+---
+
 ## 📊 REQUISITOS FUNCIONALES
 
 ### 1. AUTENTICACIÓN (RF-001)

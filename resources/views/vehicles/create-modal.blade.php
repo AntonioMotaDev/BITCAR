@@ -97,7 +97,9 @@
                                        id="fuel_capacity" 
                                        name="fuel_capacity" 
                                        value="{{ old('fuel_capacity') }}"
-                                       placeholder="000.00"
+                                       placeholder="00.00"
+                                       step="0.01"
+                                       min="0"
                                        required
                                        autofocus>
                                 @error('fuel_capacity')
@@ -182,7 +184,7 @@
                                        step="0.01"
                                        min="0"
                                        value="{{ old('mileage') }}"
-                                       placeholder="000.00"
+                                       placeholder="00.00"
                                        required
                                        autofocus>
                                 @error('mileage')

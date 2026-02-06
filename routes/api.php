@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 // API v1
 Route::prefix('v1')->group(function () {
     // Rutas públicas
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])->withoutMiddleware('csrf');
 
     // Rutas protegidas con Sanctum
     Route::middleware('auth:sanctum')->group(function () {

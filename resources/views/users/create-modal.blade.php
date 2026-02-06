@@ -179,7 +179,7 @@
 <!-- JavaScript para el modal -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. Toggle para mostrar/ocultar contraseña
+    
     const togglePassword = document.getElementById('togglePassword');
     const togglePasswordConfirm = document.getElementById('togglePasswordConfirm');
     const passwordInput = document.getElementById('password');
