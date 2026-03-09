@@ -48,13 +48,19 @@ class TripService
     public function recordLocations(Trip $trip, array $locations): void
     {
         $data = collect($locations)->map(function ($location) use ($trip) {
+            // Convertir recorded_at a Carbon si es string
+            $recordedAt = $location['recorded_at'] ?? now();
+            if (is_string($recordedAt)) {
+                $recordedAt = Carbon::parse($recordedAt);
+            }
+
             return [
                 'trip_id' => $trip->id,
-                'latitude' => $location['latitude'],
-                'longitude' => $location['longitude'],
-                'accuracy' => $location['accuracy'],
-                'speed' => $location['speed'] ?? null,
-                'recorded_at' => Carbon::parse($location['recorded_at']),
+                'latitude' => (float) $location['latitude'],
+                'longitude' => (float) $location['longitude'],
+                'accuracy' => (float) ($location['accuracy'] ?? 0),
+                'speed' => isset($location['speed']) ? (float) $location['speed'] : null,
+                'recorded_at' => $recordedAt,
                 'created_at' => now(),
                 'updated_at' => now(),
             ];

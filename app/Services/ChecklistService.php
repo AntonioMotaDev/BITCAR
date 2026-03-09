@@ -32,7 +32,7 @@ class ChecklistService
                 }
             }
 
-            return $checklist->load('items');
+            return $checklist->load('checklistItems');
         });
     }
 
@@ -50,7 +50,7 @@ class ChecklistService
 
             if (isset($data['items'])) {
                 // Eliminar items existentes
-                $checklist->items()->delete();
+                $checklist->checklistItems()->delete();
 
                 // Crear nuevos items
                 foreach ($data['items'] as $index => $itemData) {
@@ -64,7 +64,7 @@ class ChecklistService
                 }
             }
 
-            return $checklist->load('items');
+            return $checklist->load('checklistItems');
         });
     }
 
@@ -74,7 +74,7 @@ class ChecklistService
     public function getActiveChecklist(): ?Checklist
     {
         return Checklist::where('is_active', true)
-            ->with('items')
+            ->with('checklistItems')
             ->first();
     }
 
@@ -85,7 +85,7 @@ class ChecklistService
     {
         return Checklist::where('type', $type)
             ->where('is_active', true)
-            ->with('items')
+            ->with('checklistItems')
             ->first();
     }
 }

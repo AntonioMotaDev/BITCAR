@@ -9,6 +9,7 @@ class Signature extends Model
 {
     protected $fillable = [
         'vehicle_log_id',
+        'checklist_item_id',
         'signature_data',
         'signer_name',
         'signed_at',
@@ -16,6 +17,7 @@ class Signature extends Model
 
     protected $casts = [
         'vehicle_log_id' => 'integer',
+        'checklist_item_id' => 'integer',
         'signed_at' => 'datetime',
     ];
 
@@ -23,5 +25,10 @@ class Signature extends Model
     public function vehicleLog(): BelongsTo
     {
         return $this->belongsTo(VehicleLog::class);
+    }
+
+    public function checklistItem(): BelongsTo
+    {
+        return $this->belongsTo(ChecklistItem::class);
     }
 }

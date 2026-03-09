@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('vehicle_log_photos', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('checklist_item_id')->nullable()->constrained('checklist_items')->onDelete('set null');
             $table->foreignId('vehicle_log_id')->constrained('vehicle_logs')->onDelete('cascade');
             $table->string('file_path', 255);
             $table->text('description')->nullable();

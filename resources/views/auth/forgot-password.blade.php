@@ -1,25 +1,35 @@
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
+    <div class="text-center mb-4">
+        <h2 class="h5 fw-bold text-prim mb-1">Recuperar contraseña</h2>
+        <p class="text-muted mb-0">Te enviaremos un enlace de restablecimiento</p>
     </div>
 
     <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    <x-auth-session-status class="mb-3" :status="session('status')" />
 
-    <form method="POST" action="{{ route('password.email') }}">
+    <form method="POST" action="{{ route('password.email') }}" novalidate>
         @csrf
 
         <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        <div class="mb-3">
+            <label for="email" class="form-label text-prim fw-semibold">
+                <i class="bi bi-envelope me-1"></i>Correo electrónico
+            </label>
+            <input id="email" type="email" name="email" value="{{ old('email') }}"
+                   class="form-control @error('email') is-invalid @enderror"
+                   placeholder="usuario@empresa.com" required autofocus>
+            @error('email')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Email Password Reset Link') }}
-            </x-primary-button>
+        <button type="submit" class="btn btn-create w-100">
+            <i class="bi bi-send me-2"></i>Enviar enlace
+        </button>
+        <div class="text-center mt-3">
+            <a class="text-decoration-none small text-prim" href="{{ route('login') }}">
+                Volver a iniciar sesión
+            </a>
         </div>
     </form>
 </x-guest-layout>

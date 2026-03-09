@@ -37,6 +37,8 @@ class VehicleController extends Controller
             ]);
         }])
         ->paginate(15);
+
+        $vehicleAssignments = VehicleAssignment::with('user')->get()->groupBy('vehicle_id');
         
         $typeOptions = [
             'pickup' => ['label' => 'PickUp'],
@@ -46,7 +48,7 @@ class VehicleController extends Controller
             'camión' => ['label' => 'Camión']
         ];
 
-        return view('vehicles.index', compact('vehicles','typeOptions','users'));
+        return view('vehicles.index', compact('vehicles','typeOptions','users','vehicleAssignments'));
     }
 
     public function create(): View
@@ -272,6 +274,46 @@ class VehicleController extends Controller
         } catch(\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Error al asignar la unidad: ' . $e->getMessage());
+        }   
+    }
+
+    public function updateAssignment(Request $request, VehicleAssignment $assignment): RedirectResponse
+    {
+        try{
+            $validated = $request->validate([
+                'vehicle_id' => 'required|exists:vehicles,id',
+                'user_id' => 'required|exists:users,id',
+                'start_date' => 'required|date',
+                'end_date' => 'nullable|date|after_or_equal:start_date',
+            ]); 
+
+            $assignment->update([
+                'vehicle_id' => $validated['vehicle_id'],
+                'user_id' => $validated['user_id'],
+                'start_date' => $validated['start_date'],
+                'end_date' => $validated['end_date'] ?? null,
+            ]);
+
+            return redirect()->back()
+                ->with('success', 'Asignación actualizada correctamente.');
+        
+        } catch(\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error al actualizar la asignación: ' . $e->getMessage());
+        }   
+    }
+
+    public function destroyAssignment(VehicleAssignment $assignment): RedirectResponse
+    {
+        try{
+            $assignment->delete();
+
+            return redirect()->back()
+                ->with('success', 'Asignación eliminada correctamente.');
+        
+        } catch(\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error al eliminar la asignación: ' . $e->getMessage());
         }   
     }
 

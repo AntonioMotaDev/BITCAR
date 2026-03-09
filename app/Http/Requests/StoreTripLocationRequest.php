@@ -19,7 +19,7 @@ class StoreTripLocationRequest extends FormRequest
             'locations.*.longitude' => ['required', 'numeric', 'between:-180,180'],
             'locations.*.accuracy' => ['required', 'numeric', 'min:0'],
             'locations.*.speed' => ['nullable', 'numeric', 'min:0'],
-            'locations.*.recorded_at' => ['required', 'date'],
+            'locations.*.recorded_at' => ['nullable', 'date'], // Acepta cualquier formato de fecha válida
         ];
     }
 }

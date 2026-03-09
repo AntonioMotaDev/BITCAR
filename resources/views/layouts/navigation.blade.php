@@ -25,8 +25,8 @@
             </a>
             
             <a href="{{ route('checklists.index') }}" class="navbar-link {{ request()->routeIs('checklists.*') ? 'active' : '' }}">
-                <i class="bi bi-gear fw-bold"></i>
-                <span> Configuración </span>
+                <i class="bi bi-journal-text fw-bold"></i>
+                <span> Bitacoras </span>
             </a>
         </div>
 

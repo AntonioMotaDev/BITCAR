@@ -13,9 +13,12 @@ class VehicleLog extends Model
         'vehicle_id',
         'user_id',
         'checklist_id',
+        'trip_id',
         'type',
         'mileage',
         'fuel_level',
+        'latitude',
+        'longitude',
         'notes',
     ];
 
@@ -23,8 +26,11 @@ class VehicleLog extends Model
         'vehicle_id' => 'integer',
         'user_id' => 'integer',
         'checklist_id' => 'integer',
+        'trip_id' => 'integer',
         'mileage' => 'decimal:2',
         'fuel_level' => 'decimal:2',
+        'latitude' => 'decimal:8',
+        'longitude' => 'decimal:8',
     ];
 
     // Relaciones
@@ -43,6 +49,11 @@ class VehicleLog extends Model
         return $this->belongsTo(Checklist::class);
     }
 
+    public function trip(): BelongsTo
+    {
+        return $this->belongsTo(Trip::class);
+    }
+
     public function vehicleLogItems(): HasMany
     {
         return $this->hasMany(VehicleLogItem::class);
@@ -53,9 +64,9 @@ class VehicleLog extends Model
         return $this->hasMany(VehicleLogPhoto::class);
     }
 
-    public function signature(): HasOne
+    public function signatures(): HasMany
     {
-        return $this->hasOne(Signature::class);
+        return $this->hasMany(Signature::class);
     }
 
     public function incidents(): HasMany

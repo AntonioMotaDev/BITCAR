@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\ChecklistController;
+use App\Http\Controllers\Api\V1\TrackingController;
 use App\Http\Controllers\Api\V1\TripController;
+use App\Http\Controllers\Api\V1\VehicleController;
 use App\Http\Controllers\Api\V1\VehicleLogController;
 use Illuminate\Support\Facades\Route;
 
@@ -10,6 +12,9 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->group(function () {
     // Rutas públicas
     Route::post('/login', [AuthController::class, 'login'])->withoutMiddleware('csrf');
+    
+    // Tracking - Público para que el dashboard web pueda acceder
+    Route::get('/tracking/active-trips', [TrackingController::class, 'activeTripsWithLocations']);
 
     // Rutas protegidas con Sanctum
     Route::middleware('auth:sanctum')->group(function () {
@@ -35,5 +40,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/trips/active', [TripController::class, 'active']);
         Route::post('/trips/{trip}/locations', [TripController::class, 'storeLocations']);
         Route::post('/trips/{trip}/end', [TripController::class, 'endTrip']);
+
+        // Vehicles
+        Route::get('/vehicles/assigned', [VehicleController::class, 'assigned']);
     });
 });

@@ -354,6 +354,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Actualizar campo oculto con JSON
             editItemsJsonInput.value = JSON.stringify(editItems.map(item => ({
+                id: item.id,
                 label: item.label,
                 type: item.type,
                 description: item.description,

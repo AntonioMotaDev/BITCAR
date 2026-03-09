@@ -42,7 +42,7 @@ class VehicleLogController extends Controller
         }
 
         $data = array_merge($request->validated(), ['type' => 'exit']);
-        $log = $this->logService->createVehicleLog($data, $user, $vehicle);
+        $log = $this->logService->createVehicleLog($data, $user, $vehicle, $request);
 
         // Iniciar viaje
         $trip = $this->tripService->startTrip($log, $vehicle, $user);
@@ -80,7 +80,7 @@ class VehicleLogController extends Controller
         }
 
         $data = array_merge($request->validated(), ['type' => 'entry']);
-        $log = $this->logService->createVehicleLog($data, $user, $vehicle);
+        $log = $this->logService->createVehicleLog($data, $user, $vehicle, $request);
 
         // Finalizar viaje
         $trip = $this->tripService->endTrip($trip, $log);

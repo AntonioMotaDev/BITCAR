@@ -16,7 +16,7 @@
     --color-text: #222222;
     --color-text-light: #757575;
     --color-border: #e0e0e0;
-    --color-error: #ea4335;
+    --color-error: #d42727;
     --color-success: #34a853;
     --color-warning: #fbbc05;
 
@@ -134,6 +134,13 @@ body {
     background-color: var(--color-dark-gray);
     border-radius: 15px;
     color: white;
+}
+
+.btn-outline-edit{
+    background-color: transparent;
+    border: 2px solid var(--color-dark-gray);
+    border-radius: 15px;
+    color: var(--color-dark-gray);
 }
 
 .btn-eye{

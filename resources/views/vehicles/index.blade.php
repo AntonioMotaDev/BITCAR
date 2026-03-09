@@ -4,11 +4,6 @@
             <h2 class="h2 fw-bold text-dark mb-0">
                 GESTIONAR UNIDADES VEHICULARES
             </h2>
-            <div>
-                <button class="btn btn-add" data-bs-toggle="modal" data-bs-target="#createVehicleModal">
-                    <i class="bi bi-plus-lg"></i> Crear Nueva Unidad
-                </button>
-            </div>
         </div>
     </x-slot>
 
@@ -23,20 +18,13 @@
                         <!-- Encabezado con avatar -->
                         <div class="d-flex align-items-start mb-4">
                             <div class="avatar-large me-4 flex-shrink-0" id="avatar-container">
-                                @if($vehicles->isEmpty())
-                                    <!-- Icono por defecto -->
-                                    <div class="avatar-small d-flex align-items-center justify-content-center w-100 h-100">
-                                        <i class="bi bi-person-fill fs-1 text-muted" style="display: none;"></i>
-                                    </div>
-                                @else
-                                <!-- Imagen del vehículo -->
-                                    <img src="/storage/{{ $vehicles->first()->image }}" 
-                                        alt="Avatar" 
-                                        class="vehicle-image rounded-circle w-100 h-100 object-fit-cover">
-                                @endif
-                                <!-- Icono por defecto -->
-                                <div class="avatar-small d-flex align-items-center justify-content-center w-100 h-100">
-                                    <i class="bi bi-person-fill fs-1 text-muted" style="display: none;"></i>
+                                <!-- Imagen del vehículo (se muestra solo si hay imagen) -->
+                                <img src="{{ $vehicles->first()->image ? '/storage/' . $vehicles->first()->image : '' }}" 
+                                    alt="Avatar" 
+                                    class="vehicle-image rounded-circle w-100 h-100 object-fit-cover {{ $vehicles->first()->image ? '' : 'd-none' }}">
+                                <!-- Icono por defecto (se muestra si no hay imagen) -->
+                                <div class="avatar-small vehicle-avatar-icon d-flex align-items-center justify-content-center w-100 h-100 {{ $vehicles->first()->image ? 'd-none' : '' }}">
+                                    <i class="bi bi-car-front fs-1 text-muted"></i>
                                 </div>
                             </div>
                             
@@ -136,33 +124,30 @@
                 </div>
             </div>
 
-            <!-- Unidades Registradas -->
+            <!-- Columna derecha -->
             <div class="col-lg-8">
                 <div>
                     <div class="card-body">
                         <!-- Barra de búsqueda -->
-                        <div class="row mb-4">
+                        <div class="row mb-2">
                             <div class="search-container">
                                     <div class="input-group search-box  rounded-pill overflow-hidden">
                                         <span class="input-group-text bg-white border-end-0">
                                         </span>
-                                        <input type="text" class="form-control border-start-0" placeholder="Buscar usuario..." aria-label="Buscar usuario">
-                                        <button class="btn  bg-white"  type="button">
-                                            <i class="bi bi-search"></i>
-                                        </button>
+                                        <input type="text" class="form-control border-start-0" id="vehicleSearch" placeholder="Buscar unidad..." aria-label="Buscar unidad">
                                     </div>
                             </div>
                             <div class="col-12 py-4">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h2 class="h3 fw-bold text-secondary mb-0">Unidades Registradas</h2>
-                                    <button class="btn btn-i" data-bs-toggle="modal" data-bs-target="#assignVehicleModal">
-                                        <i class="bi bi-person"></i> Asignar Unidad
-                                    </button>
+                                        <button class="btn btn-add" data-bs-toggle="modal" data-bs-target="#createVehicleModal">
+                                            <i class="bi bi-plus-lg"></i> Crear Nueva Unidad
+                                        </button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Lista de Usuarios -->
+                        <!-- Lista de vehículos -->
                         <div class="table-responsive card card-custom">
                             <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
                                 <table class="table table-hover align-middle mb-0">
@@ -261,7 +246,95 @@
                         <div class="d-flex justify-content-end mt-2 pt-3 border-top">
                              {{ $vehicles->links('pagination::bootstrap-5') }}
                         </div>
-                    </div>
+
+                        <div class="row mb-2">
+                            <div class="col-12 py-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h2 class="h3 fw-bold text-secondary mb-0">Asignaciones Unidad <-> Operador </h2>
+                                    <button class="btn btn-i" data-bs-toggle="modal" data-bs-target="#assignVehicleModal">
+                                        <i class="bi bi-person"></i> Asignar Unidad
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lista de asignaciones -->
+                        <div class="table-responsive card card-custom">
+                            <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead>
+                                        <tr class="table-light">
+                                            <th scope="col" class="ps-3">Unidad</th>
+                                            <th scope="col">Inicio</th>
+                                            <th scope="col">Expiración</th>
+                                            <th scope="col" class="text-end pe-3">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if($vehicleAssignments->isEmpty())
+                                            <tr>
+                                                <td colspan="6" class="text-center py-4">
+                                                    <div class="d-flex flex-column align-items-center">
+                                                        <i class="bi bi-person fs-1 text-muted mb-2"></i>
+                                                        <p class="text-muted mb-0">No hay asignaciones registradas</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @else
+                                            @foreach($vehicleAssignments as $vehicleId => $assignments)
+                                                @foreach($assignments as $assignment)
+                                                    <tr>
+                                                        <td class="ps-3">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="avatar-small bg-primary bg-opacity-10 me-3">
+                                                                    <i class="bi bi-person-vcard text-prim"></i>
+                                                                </div>
+                                                                <div>
+                                                                    {{ $assignment->user->name }}
+                                                                    <h3 class="h6 fw-bold mb-0 info-header">{{ $assignment->vehicle->brand }}, {{ $assignment->vehicle->model }}</h3>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td class="ps-3">
+                                                            <div class="d-flex align-items-center">
+                                                                {{-- <div class="avatar-small bg-primary bg-opacity-10 me-3">
+                                                                    <i class="bi bi-person text-prim"></i>
+                                                                </div> --}}
+                                                                <div>
+                                                                    {{ $assignment->start_date->format('d/m/Y') }}
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td> {{ $assignment->end_date ? $assignment->end_date->format('d/m/Y') : '-' }}</td>
+                                                        <td class="text-end pe-3">
+                                                            <div class="d-flex gap-2 justify-content-end">
+                                                                <button class="btn btn-edit"
+                                                                        data-bs-toggle="modal" 
+                                                                        data-bs-target="#editAssignmentModal"
+                                                                        data-assignment-id="{{ $assignment->id }}"
+                                                                        data-vehicle-id="{{ $assignment->vehicle_id }}"
+                                                                        data-user-id="{{ $assignment->user_id }}"
+                                                                        data-start-date="{{ $assignment->start_date->format('Y-m-d') }}"
+                                                                        data-expiration-date="{{ $assignment->end_date ? $assignment->end_date->format('Y-m-d') : '' }}"
+                                                                        title="Editar asignación">
+                                                                    <i class="bi bi-pencil-square"></i> Editar
+                                                                </button>
+                                                                <button class="btn btn-delete" 
+                                                                        data-assignment-id="{{ $assignment->id }}"
+                                                                        title="Remover asignación">
+                                                                    <i class="bi bi-trash"></i> Remover
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            @endforeach
+                                        @endif
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>  
                 </div>
             </div>
         </div>
@@ -270,6 +343,7 @@
     @include('vehicles.edit-modal')
     @include('documents.upload-file-vh-modal')
     @include('vehicles.assignment-modal')
+    @include('vehicles.edit-assignment-modal')
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -334,33 +408,36 @@
             }
 
             function updateUserAvatar(vehicleImage, vehicleBrand) {
-                const imgElement = document.querySelector('.vehicle-image');
-                const iconElement = document.querySelector('.avatar-small i');
+                const imgElement = document.querySelector('#avatar-container .vehicle-image');
+                const iconContainer = document.querySelector('#avatar-container .vehicle-avatar-icon');
                 
                 if (vehicleImage) {
                     // Si tiene imagen mostrarla
-                    imgElement.src = `/storage/${vehicleImage}`;
-                    imgElement.alt = `Avatar de ${vehicleBrand}`;
-                    imgElement.style.display = 'block';
-                    
-                    if (iconElement) {
-                        iconElement.style.display = 'none';
+                    if (imgElement) {
+                        imgElement.src = `/storage/${vehicleImage}`;
+                        imgElement.alt = `Avatar de ${vehicleBrand}`;
+                        imgElement.classList.remove('d-none');
+
+                        // Manejar error si la imagen no carga
+                        imgElement.onerror = function() {
+                            imgElement.classList.add('d-none');
+                            if (iconContainer) {
+                                iconContainer.classList.remove('d-none');
+                            }
+                        };
                     }
                     
-                    // Manejar error si la imagen no carga
-                    imgElement.onerror = function() {
-                        imgElement.style.display = 'none';
-                        if (iconElement) {
-                            iconElement.style.display = 'block';
-                        }
-                    };
-                    
+                    if (iconContainer) {
+                        iconContainer.classList.add('d-none');
+                    }
                 } else {
                     // Mostrar icono
-                    imgElement.style.display = 'none';
+                    if (imgElement) {
+                        imgElement.classList.add('d-none');
+                    }
                     
-                    if (iconElement) {
-                        iconElement.style.display = 'block';
+                    if (iconContainer) {
+                        iconContainer.classList.remove('d-none');
                     }
                 }
             }
@@ -752,14 +829,17 @@
                     });
                 });
 
-                
+                // Eventos para botones de eliminar (solo asignaciones)
                 document.querySelectorAll('.btn-delete').forEach(button => {
                     button.addEventListener('click', function(e) {
                         e.stopPropagation();
-                        const vehicleId = this.getAttribute('data-vehicle-id');
-                        if (confirm(`¿Está seguro de eliminar esta unidad?`)) {
-                            console.log('Eliminar unidad:', vehicleId);
-                            // Aquí iría la lógica para eliminar
+                        const assignmentId = this.getAttribute('data-assignment-id');
+                        
+                        if (assignmentId) {
+                            // Eliminar asignación
+                            if (confirm(`¿Está seguro de remover esta asignación?`)) {
+                                deleteAssignment(assignmentId);
+                            }
                         }
                     });
                 });
@@ -803,6 +883,31 @@
                         loadVehicleInfo(vehicleRow);
                     }
                 }
+            }
+            
+            // Función para eliminar asignación
+            function deleteAssignment(assignmentId) {
+                fetch(`/vehicles/assignment/${assignmentId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Asignación eliminada correctamente');
+                        // Recargar la página
+                        location.reload();
+                    } else {
+                        alert('Error al eliminar la asignación');
+                        console.error('Error:', response.statusText);
+                    }
+                })
+                .catch(error => {
+                    alert('Error al eliminar la asignación');
+                    console.error('Error:', error);
+                });
             }
             
             // Iniciar todo

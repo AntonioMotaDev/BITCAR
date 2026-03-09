@@ -12,11 +12,11 @@ class ChecklistResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'version' => $this->version,
             'type' => $this->type,
             'is_active' => $this->is_active,
-            'items' => ChecklistItemResource::collection($this->whenLoaded('items')),
+            'checklistItems' => ChecklistItemResource::collection($this->whenLoaded('checklistItems')),
             'created_at' => $this->created_at?->toIso8601String(),
+            'updated_at' => $this->updated_at?->toIso8601String(),
         ];
     }
 }

@@ -16,9 +16,11 @@ return new class extends Migration
             $table->foreignId('vehicle_id')->constrained('vehicles')->onDelete('restrict');
             $table->foreignId('user_id')->constrained('users')->onDelete('restrict');
             $table->foreignId('checklist_id')->nullable()->constrained('checklists')->onDelete('set null');
-            $table->enum('type', ['entrada', 'salida']);
-            $table->decimal('mileage', 10, 2);
+            $table->enum('type', ['entry','exit','trip_start','trip_checkpoint','trip_end','fuel','incident','maintenance','other'])->default('other');
+            $table->decimal('mileage', 10, 2)->nullable();
             $table->decimal('fuel_level', 5, 2)->nullable();
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
             

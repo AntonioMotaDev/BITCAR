@@ -52,4 +52,15 @@ class Trip extends Model
     {
         return $this->hasMany(TripLocation::class)->orderBy('recorded_at');
     }
+
+    public function vehicleLogs(): HasMany
+    {
+        return $this->hasMany(VehicleLog::class);
+    }
+
+    public function isActive(): bool
+    {
+        // Un viaje está activo si no tiene end_time, independientemente de is_active
+        return $this->end_time === null;
+    }
 }

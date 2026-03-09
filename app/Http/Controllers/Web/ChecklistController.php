@@ -14,6 +14,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\ChecklistItem;
 
+// logs
+use Illuminate\Support\Facades\Log;
+
 class ChecklistController extends Controller
 {
     use AuthorizesRequests;
@@ -41,7 +44,7 @@ class ChecklistController extends Controller
         ->paginate(15);
         
         $typeOptions = [
-            'boolean' => ['label' => 'Boleano'],
+            'boolean' => ['label' => 'Si/No (Checkbox)'],
             'text' => ['label' => 'Texto'],
             'number' => ['label' => 'Numerico'],
             'photo' => ['label' => 'Foto'],
@@ -150,6 +153,9 @@ class ChecklistController extends Controller
                     ]);
                 }
                 
+                // Actualizar timestamp del checklist para invalidar caché en app móvil
+                $checklist->touch();
+                
                 DB::commit();
                 
                 // Redirigir con mensaje de éxito
@@ -167,8 +173,8 @@ class ChecklistController extends Controller
                 ->withInput();
                 
         } catch (\Exception $e) {
-            \Log::error('Error al crear checklist: ' . $e->getMessage(), [
-                'user_id' => auth()->id(),
+            Log::error('Error al crear checklist: ' . $e->getMessage(), [
+                'user_id' => $request->user()->id ?? null,
                 'request_data' => $request->except('items'),
                 'trace' => $e->getTraceAsString(),
             ]);
@@ -182,14 +188,14 @@ class ChecklistController extends Controller
     public function show(Checklist $checklist): View
     {
         $this->authorize('view', $checklist);
-        $checklist->load('items');
+        $checklist->load('checklistItems');
         return view('checklists.show', compact('checklist'));
     }
 
     public function edit(Checklist $checklist): View
     {
         $this->authorize('update', $checklist);
-        $checklist->load('items');
+        $checklist->load('checklistItems');
         return view('checklists.edit', compact('checklist'));
     }
 
@@ -261,12 +267,16 @@ class ChecklistController extends Controller
                     'type' => $validated['edit_checklist_type'],
                 ]);
                 
-                // Eliminar los items existentes
-                $checklist->checklistItems()->delete();
+                // Obtener los items existentes
+                $existingItems = $checklist->checklistItems()->get()->keyBy('id');
+                $existingItemIds = $existingItems->keys()->toArray();
+                $submittedItemIds = [];
                 
-                // Crear los nuevos items del checklist
+                // Actualizar o crear items
                 foreach ($items as $order => $itemData) {
-                    ChecklistItem::create([
+                    $itemId = $itemData['id'] ?? null;
+                    
+                    $itemAttributes = [
                         'checklist_id' => $checklist->id,
                         'label' => trim($itemData['label']),
                         'type' => $itemData['type'],
@@ -275,7 +285,41 @@ class ChecklistController extends Controller
                         'required' => isset($itemData['is_required']) ? 
                             (boolval($itemData['is_required']) || $itemData['is_required'] == 1) : 
                             false,
-                    ]);
+                    ];
+                    
+                    if ($itemId && in_array($itemId, $existingItemIds)) {
+                        // Actualizar item existente
+                        ChecklistItem::where('id', $itemId)->update($itemAttributes);
+                        $submittedItemIds[] = $itemId;
+                    } else {
+                        // Crear nuevo item
+                        $newItem = ChecklistItem::create($itemAttributes);
+                        $submittedItemIds[] = $newItem->id;
+                    }
+                }
+                
+                // Eliminar items que fueron removidos (solo si no tienen vehicle_log_items)
+                $itemsToDelete = array_diff($existingItemIds, $submittedItemIds);
+                if (!empty($itemsToDelete)) {
+                    // Verificar cuáles items tienen respuestas
+                    $itemsWithAnswers = DB::table('vehicle_log_items')
+                        ->whereIn('checklist_item_id', $itemsToDelete)
+                        ->pluck('checklist_item_id')
+                        ->unique()
+                        ->toArray();
+                    
+                    // Solo eliminar items sin respuestas
+                    $safeToDelete = array_diff($itemsToDelete, $itemsWithAnswers);
+                    
+                    if (!empty($safeToDelete)) {
+                        ChecklistItem::whereIn('id', $safeToDelete)->delete();
+                    }
+                    
+                    // Si hay items con respuestas que no se pueden eliminar, notificar
+                    if (!empty($itemsWithAnswers)) {
+                        $itemsWithAnswersNames = $existingItems->whereIn('id', $itemsWithAnswers)->pluck('label')->join(', ');
+                        session()->flash('warning', 'Algunos items no se pudieron eliminar porque ya tienen respuestas registradas: ' . $itemsWithAnswersNames);
+                    }
                 }
                 
                 DB::commit();
@@ -295,8 +339,8 @@ class ChecklistController extends Controller
                 ->withInput();
                 
         } catch (\Exception $e) {
-            \Log::error('Error al actualizar checklist: ' . $e->getMessage(), [
-                'user_id' => auth()->id(),
+            Log::error('Error al actualizar checklist: ' . $e->getMessage(), [
+                'user_id' => $request->user()->id ?? null,
                 'checklist_id' => $checklist->id,
                 'request_data' => $request->except('items'),
                 'trace' => $e->getTraceAsString(),
@@ -313,5 +357,51 @@ class ChecklistController extends Controller
         $this->authorize('delete', $checklist);
         $checklist->delete();
         return redirect()->route('checklists.index')->with('success', 'Checklist eliminado');
+    }
+
+    public function duplicate(Request $request, Checklist $checklist): RedirectResponse
+    {
+        $this->authorize('create', Checklist::class);
+        
+        try {
+            DB::beginTransaction();
+            
+            // Crear el checklist duplicado
+            $newChecklist = Checklist::create([
+                'name' => $checklist->name . ' (Copia)',
+                'description' => $checklist->description,
+                'is_active' => false, // Crear inactivo por defecto
+                'type' => $checklist->type,
+            ]);
+            
+            // Duplicar los items del checklist
+            foreach ($checklist->checklistItems as $item) {
+                ChecklistItem::create([
+                    'checklist_id' => $newChecklist->id,
+                    'label' => $item->label,
+                    'type' => $item->type,
+                    'description' => $item->description,
+                    'order' => $item->order,
+                    'required' => $item->required,
+                ]);
+            }
+            
+            DB::commit();
+            
+            return redirect()->route('checklists.index')
+                ->with('success', 'Bitácora duplicada exitosamente. Puedes editarla para hacer los ajustes necesarios.');
+                
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('Error al duplicar checklist: ' . $e->getMessage(), [
+                'user_id' => $request->user()->id ?? null,
+                'checklist_id' => $checklist->id,
+                'trace' => $e->getTraceAsString(),
+            ]);
+            
+            return redirect()->back()
+                ->with('error', 'Error al duplicar la bitácora: ' . $e->getMessage());
+        }
     }
 }

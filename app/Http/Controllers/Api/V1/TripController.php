@@ -50,15 +50,30 @@ class TripController extends Controller
         if (! $trip->isActive()) {
             return response()->json([
                 'message' => 'El viaje ya ha finalizado',
+                'trip_status' => [
+                    'is_active' => $trip->is_active,
+                    'end_time' => $trip->end_time,
+                ],
             ], 422);
         }
 
         $this->tripService->recordLocations($trip, $request->locations);
 
+        // Obtener las ubicaciones registradas para confirmar
+        $recordedLocations = $trip->tripLocations()->latest('recorded_at')->limit(count($request->locations))->get();
+
         return response()->json([
             'message' => 'Ubicaciones registradas',
             'data' => [
                 'locations_count' => count($request->locations),
+                'trip_id' => $trip->id,
+                'recorded_locations' => $recordedLocations->map(fn($loc) => [
+                    'latitude' => (float) $loc->latitude,
+                    'longitude' => (float) $loc->longitude,
+                    'accuracy' => (float) $loc->accuracy,
+                    'speed' => (float) ($loc->speed ?? 0),
+                    'recorded_at' => $loc->recorded_at->toIso8601String(),
+                ]),
             ],
         ], 201);
     }

@@ -15,6 +15,8 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/trip-requests/{vehicleLog}/approve', [DashboardController::class, 'approveTrip'])->name('trips.approve');
+    Route::post('/trip-requests/{vehicleLog}/reject', [DashboardController::class, 'rejectTrip'])->name('trips.reject');
 
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -26,6 +28,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('vehicles', VehicleController::class);
         Route::post('vehicles/documents/upload', [VehicleController::class, 'uploadDocument'])->name('vehicles.documents.store');
         Route::post('vehicles/assignment/store', [VehicleController::class, 'storeAssignment'])->name('vehicles.assignment.store');
+        Route::put('vehicles/assignment/{assignment}', [VehicleController::class, 'updateAssignment'])->name('vehicles.assignment.update');
+        Route::delete('vehicles/assignment/{assignment}', [VehicleController::class, 'destroyAssignment'])->name('vehicles.assignment.destroy');
     });
 
     // Users - Solo admin
@@ -37,6 +41,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Checklists - Admin y supervisor
     Route::middleware('can:viewAny,App\Models\Checklist')->group(function () {
         Route::resource('checklists', ChecklistController::class);
+        Route::post('checklists/{checklist}/duplicate', [ChecklistController::class, 'duplicate'])->name('checklists.duplicate');
     });
 
     // Vehicle Logs

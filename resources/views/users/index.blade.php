@@ -22,14 +22,14 @@
                     <div class="card-body p-4">
                         <!-- Encabezado con avatar -->
                         <div class="d-flex align-items-start mb-4">
-                            <div class="avatar-large me-4 flex-shrink-0" id="avatar-container">
-                                <!-- Imagen del usuario -->
-                                    <img src="/storage/{{ $users->first()->image }}" 
-                                        alt="Avatar" 
-                                        class="user-image rounded-circle w-100 h-100 object-fit-cover">
-                                <!-- Icono por defecto -->
-                                <div class="avatar-small d-flex align-items-center justify-content-center w-100 h-100">
-                                    <i class="bi bi-person-fill fs-1 text-muted" style="display: none;"></i>
+                            <div class="avatar-large me-4 flex-shrink-0" id="user-avatar-container">
+                                <!-- Imagen del usuario (se muestra solo si hay imagen) -->
+                                <img src="{{ $users->first()->image ? '/storage/' . $users->first()->image : '' }}" 
+                                    alt="Avatar" 
+                                    class="user-image rounded-circle w-100 h-100 object-fit-cover {{ $users->first()->image ? '' : 'd-none' }}">
+                                <!-- Icono por defecto (se muestra si no hay imagen) -->
+                                <div class="avatar-small user-avatar-icon d-flex align-items-center justify-content-center w-100 h-100 {{ $users->first()->image ? 'd-none' : '' }}">
+                                    <i class="bi bi-person-fill fs-1 text-muted"></i>
                                 </div>
                             </div>
                             <div class="flex-grow-1 info-header">
@@ -118,8 +118,8 @@
                                     <div class="input-group search-box  rounded-pill overflow-hidden">
                                         <span class="input-group-text bg-white border-end-0">
                                         </span>
-                                        <input type="text" class="form-control border-start-0" placeholder="Buscar usuario..." aria-label="Buscar usuario">
-                                        <button class="btn  bg-white"  type="button">
+                                        <input type="text" class="form-control border-start-0" id="userSearch" placeholder="Buscar usuario..." aria-label="Buscar usuario">
+                                        <button class="btn  bg-white" type="button" id="userSearchBtn">
                                             <i class="bi bi-search"></i>
                                         </button>
                                     </div>
@@ -268,33 +268,36 @@
             }
 
             function updateUserAvatar(userImage, userName) {
-                const imgElement = document.querySelector('.user-image');
-                const iconElement = document.querySelector('.avatar-small i');
+                const imgElement = document.querySelector('#user-avatar-container .user-image');
+                const iconContainer = document.querySelector('#user-avatar-container .user-avatar-icon');
                 
                 if (userImage) {
                     // Si tiene imagen mostrarla
-                    imgElement.src = `/storage/${userImage}`;
-                    imgElement.alt = `Avatar de ${userName}`;
-                    imgElement.style.display = 'block';
-                    
-                    if (iconElement) {
-                        iconElement.style.display = 'none';
+                    if (imgElement) {
+                        imgElement.src = `/storage/${userImage}`;
+                        imgElement.alt = `Avatar de ${userName}`;
+                        imgElement.classList.remove('d-none');
+
+                        // Manejar error si la imagen no carga
+                        imgElement.onerror = function() {
+                            imgElement.classList.add('d-none');
+                            if (iconContainer) {
+                                iconContainer.classList.remove('d-none');
+                            }
+                        };
                     }
                     
-                    // Manejar error si la imagen no carga
-                    imgElement.onerror = function() {
-                        imgElement.style.display = 'none';
-                        if (iconElement) {
-                            iconElement.style.display = 'block';
-                        }
-                    };
-                    
+                    if (iconContainer) {
+                        iconContainer.classList.add('d-none');
+                    }
                 } else {
                     // Mostrar icono
-                    imgElement.style.display = 'none';
+                    if (imgElement) {
+                        imgElement.classList.add('d-none');
+                    }
                     
-                    if (iconElement) {
-                        iconElement.style.display = 'block';
+                    if (iconContainer) {
+                        iconContainer.classList.remove('d-none');
                     }
                 }
             }
@@ -367,6 +370,41 @@
                 document.querySelector('.user-role').textContent = 'N/A';
                 document.querySelector('.user-email').textContent = 'N/A';
             }
+
+            // Filtrar usuarios
+            function filterUsers() {
+                const searchTerm = document.getElementById('userSearch')?.value.toLowerCase().trim() || '';
+                const rows = document.querySelectorAll('.user-row');
+                let visibleCount = 0;
+                let firstVisibleRow = null;
+
+                rows.forEach(row => {
+                    const userName = row.getAttribute('data-user-name')?.toLowerCase() || '';
+                    const userEmail = row.getAttribute('data-user-email')?.toLowerCase() || '';
+                    const userRole = row.getAttribute('data-user-role')?.toLowerCase() || '';
+                    const userId = row.getAttribute('data-user-id')?.toLowerCase() || '';
+
+                    const matchesSearch = searchTerm === '' ||
+                        userName.includes(searchTerm) ||
+                        userEmail.includes(searchTerm) ||
+                        userRole.includes(searchTerm) ||
+                        userId.includes(searchTerm);
+
+                    if (matchesSearch) {
+                        row.style.display = '';
+                        visibleCount++;
+                        if (!firstVisibleRow) firstVisibleRow = row;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                if (visibleCount === 0) {
+                    showNoResultsMessage();
+                } else if (firstVisibleRow) {
+                    loadUserInfo(firstVisibleRow);
+                }
+            }
             
             // Eventos para botones "Ver"
             document.querySelectorAll('.btn-view-user').forEach(button => {
@@ -376,6 +414,26 @@
                     loadUserInfo(userRow);
                 });
             });
+
+            // Eventos para búsqueda
+            const userSearch = document.getElementById('userSearch');
+            const userSearchBtn = document.getElementById('userSearchBtn');
+
+            if (userSearch) {
+                userSearch.addEventListener('input', filterUsers);
+                userSearch.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        filterUsers();
+                    }
+                });
+            }
+
+            if (userSearchBtn) {
+                userSearchBtn.addEventListener('click', function() {
+                    filterUsers();
+                });
+            }
             
             document.querySelectorAll('.btn-delete').forEach(button => {
                 button.addEventListener('click', function(e) {
