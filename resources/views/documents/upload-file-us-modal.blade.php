@@ -14,12 +14,12 @@
                 <div class="modal-body">
                     <!-- Nombre del Documento -->
                     <div class="mb-3">
-                        <label for="file_name" class="form-label">
+                        <label for="us_file_name" class="form-label">
                             <i class="bi bi-file-text-fill me-1"></i>Nombre del Documento *
                         </label>
                         <input type="text" 
                                class="form-control" 
-                               id="file_name" 
+                               id="us_file_name" 
                                name="file_name" 
                                placeholder="Ej: Póliza de Seguro"
                                required>
@@ -27,25 +27,27 @@
                     
                     <!-- Archivo -->
                     <div class="mb-3">
-                        <label for="document_file" class="form-label">
+                        <label for="us_document_file" class="form-label">
                             <i class="bi bi-paperclip me-1"></i>Archivo *
                         </label>
                         <input type="file" 
                                class="form-control" 
-                               id="document_file" 
+                               id="us_document_file" 
                                name="document_file"
+                               accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.txt"
                                required>
-                        <small class="text-muted">Tamaño máximo: 5MB</small>
+                           <small class="text-muted">Formatos permitidos: PDF, DOC, DOCX, XLS, XLSX, JPG, JPEG, PNG, TXT. Tamano maximo: 5MB</small>
+                           <div class="invalid-feedback" id="us_document_file_error"></div>
                     </div>
                     
                     <!-- Fecha de Expiración -->
                     <div class="mb-3">
-                        <label for="expiration_date" class="form-label">
+                        <label for="us_expiration_date" class="form-label">
                             <i class="bi bi-calendar-date me-1"></i>Fecha de Expiración (Opcional)
                         </label>
                         <input type="date" 
                                class="form-control" 
-                               id="expiration_date" 
+                               id="us_expiration_date" 
                                name="expiration_date">
                         <small class="text-muted">Selecciona la fecha en que expira este documento</small>
                     </div>
@@ -66,6 +68,53 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const uploadDocumentUsModal = document.getElementById('uploadDocumentUsModal');
+    const uploadDocumentUsForm = document.getElementById('uploadDocumentUsForm');
+    const usDocumentFile = document.getElementById('us_document_file');
+    const usDocumentFileError = document.getElementById('us_document_file_error');
+    const usSubmitButton = uploadDocumentUsForm?.querySelector('button[type="submit"]');
+
+    const maxFileSizeBytes = 5 * 1024 * 1024;
+    const allowedExtensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png', 'txt'];
+
+    function validateUserFile() {
+        if (!usDocumentFile || !usDocumentFile.files || usDocumentFile.files.length === 0) {
+            usDocumentFile?.classList.remove('is-invalid');
+            if (usDocumentFileError) usDocumentFileError.textContent = '';
+            if (usSubmitButton) usSubmitButton.disabled = false;
+            return true;
+        }
+
+        const file = usDocumentFile.files[0];
+        const extension = file.name.split('.').pop()?.toLowerCase() || '';
+        let errorMessage = '';
+
+        if (!allowedExtensions.includes(extension)) {
+            errorMessage = 'Formato no compatible. Usa: PDF, DOC, DOCX, XLS, XLSX, JPG, JPEG, PNG o TXT.';
+        } else if (file.size > maxFileSizeBytes) {
+            errorMessage = 'El archivo supera 5MB. Selecciona uno mas pequeno.';
+        }
+
+        if (errorMessage) {
+            usDocumentFile.classList.add('is-invalid');
+            if (usDocumentFileError) usDocumentFileError.textContent = errorMessage;
+            if (usSubmitButton) usSubmitButton.disabled = true;
+            return false;
+        }
+
+        usDocumentFile.classList.remove('is-invalid');
+        if (usDocumentFileError) usDocumentFileError.textContent = '';
+        if (usSubmitButton) usSubmitButton.disabled = false;
+        return true;
+    }
+
+    usDocumentFile?.addEventListener('change', validateUserFile);
+
+    uploadDocumentUsForm?.addEventListener('submit', function(event) {
+        if (!validateUserFile()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    });
     
     if (uploadDocumentUsModal) {
         uploadDocumentUsModal.addEventListener('shown.bs.modal', function(event) {
@@ -79,6 +128,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     userIdInput.value = userId;
                 }
             }
+
+            usDocumentFile?.classList.remove('is-invalid');
+            if (usDocumentFileError) usDocumentFileError.textContent = '';
+            if (usSubmitButton) usSubmitButton.disabled = false;
         });
     }
 });

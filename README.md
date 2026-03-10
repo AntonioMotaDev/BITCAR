@@ -1,18 +1,21 @@
 # BITCAR
 
-Sistema de gestión de bitácoras vehiculares con panel web y API REST para app móvil.
+## Descripción
+
+Sistema de gestión de bitácoras, unidades vehiculares y operadores con panel web y [API REST para app móvil](https://github.com/AntonioMotaDev/BITCAR-MOBILE.git)
+
 
 ## Vista previa
 
-![Panel principal](docs/images/dashboard.png)
+![Panel principal](img/dashboard.png)
 
 ## Características
 
-- Gestión de vehículos, usuarios y checklists
+- Gestión de vehículos, usuarios y bitácoras dinámicas. 
 - Registro de entrada/salida de vehículo
 - Gestión de incidencias
 - Tracking GPS por viaje
-- API autenticada con Sanctum
+<!-- - API autenticada con Sanctum -->
 
 ## Stack
 
@@ -21,28 +24,15 @@ Sistema de gestión de bitácoras vehiculares con panel web y API REST para app 
 - MySQL
 - Laravel Breeze
 - Laravel Sanctum
-
+<!-- 
 ## Requisitos
 
 - PHP 8.2+
 - Composer
 - Node.js y npm
-- MySQL 8+
+- MySQL 8+ -->
 
-## Instalación rápida
-
-1. Clonar repositorio e instalar dependencias:
-    - `composer install`
-    - `npm install`
-2. Configurar `.env` y base de datos.
-3. Ejecutar migraciones:
-    - `php artisan migrate --seed`
-4. Generar enlace de storage:
-    - `php artisan storage:link`
-5. Iniciar proyecto:
-    - `php artisan serve`
-    - `npm run dev`
-
+<!-- 
 ## Endpoints principales
 
 - `POST /api/v1/login`
@@ -50,12 +40,12 @@ Sistema de gestión de bitácoras vehiculares con panel web y API REST para app 
 - `GET /api/v1/checklists/active`
 - `POST /api/v1/vehicle-logs/exit`
 - `POST /api/v1/vehicle-logs/entry`
-- `GET /api/v1/trips/active`
+- `GET /api/v1/trips/active` -->
 
 ## Capturas 
 
-![Listado de bitácoras](docs/images/checklists.png)
-![Detalle de viaje](docs/images/trip-detail.png)
+![Listado de bitácoras](img/checklist.png)
+![Detalle de viaje](img/UnidadesVehiculares.png)
 
 ## Licencia
 

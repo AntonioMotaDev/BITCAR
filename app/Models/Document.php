@@ -18,6 +18,6 @@ class Document extends Model
     protected $casts = [
         'user_id' => 'integer',
         'vehicle_id' => 'integer',
-        'expiration_date' => 'datetime',
+        'expiration_date' => 'date',
     ];
 }

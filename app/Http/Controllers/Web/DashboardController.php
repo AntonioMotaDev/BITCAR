@@ -7,6 +7,7 @@ use App\Models\Trip;
 use App\Models\Vehicle;
 use App\Models\VehicleLog;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -30,7 +31,7 @@ class DashboardController extends Controller
             'vehicleLogItems.checklistItem',
             'incidents',
             'vehicleLogPhotos',
-            'signatures',
+            'signatures.checklistItem',
         ])
             ->latest();
 
@@ -47,7 +48,15 @@ class DashboardController extends Controller
         }
 
         if ($request->filled('log_type')) {
-            $recentLogsQuery->where('type', $request->input('log_type'));
+            $logType = $request->input('log_type');
+
+            if ($logType === 'entry') {
+                $recentLogsQuery->whereIn('type', ['entry', 'entrada']);
+            } elseif ($logType === 'exit') {
+                $recentLogsQuery->whereIn('type', ['exit', 'salida']);
+            } else {
+                $recentLogsQuery->where('type', $logType);
+            }
         }
 
         $recentLogs = $recentLogsQuery->limit(50)->get();
@@ -72,6 +81,64 @@ class DashboardController extends Controller
         $vehicles = Vehicle::all();
 
         return view('dashboard', compact('stats', 'recentLogs', 'activeTrips', 'pendingTripLogs', 'users', 'vehicles'));
+    }
+
+    public function logModalData(Request $request, VehicleLog $vehicleLog): JsonResponse
+    {
+        $vehicleLog->load([
+            'vehicleLogItems.checklistItem',
+            'vehicleLogPhotos',
+            'signatures.checklistItem',
+            'user',
+            'vehicle',
+        ]);
+
+        $photosByItem = $vehicleLog->vehicleLogPhotos->groupBy('checklist_item_id');
+
+        $logItems = $vehicleLog->vehicleLogItems->map(function ($item) use ($photosByItem) {
+            $itemPhotos = $photosByItem->get($item->checklist_item_id, collect())->map(function ($photo) {
+                return [
+                    'file_path' => $photo->file_path,
+                    'description' => $photo->description,
+                ];
+            })->values();
+
+            return [
+                'question' => $item->checklistItem?->label ?? 'Pregunta',
+                'boolean_answer' => $item->boolean_answer,
+                'text_answer' => $item->text_answer,
+                'numeric_answer' => $item->numeric_answer,
+                'photos' => $itemPhotos,
+            ];
+        })->values();
+
+        $logPhotos = $vehicleLog->vehicleLogPhotos->filter(function ($photo) {
+            return $photo->checklist_item_id === null;
+        })->map(function ($photo) {
+            return [
+                'file_path' => $photo->file_path,
+                'description' => $photo->description,
+            ];
+        })->values();
+
+        $logSignatures = $vehicleLog->signatures->map(function ($signature) {
+            return [
+                'checklist_item_id' => $signature->checklist_item_id,
+                'checklist_item' => $signature->checklistItem?->label,
+                'signature_data' => $signature->signature_data,
+                'signer_name' => $signature->signer_name,
+                'signed_at' => optional($signature->signed_at)->format('d/m/Y H:i'),
+            ];
+        })->values();
+
+        return response()->json([
+            'data' => [
+                'detail' => $vehicleLog->notes ?? $vehicleLog->description ?? '-',
+                'items' => $logItems,
+                'photos' => $logPhotos,
+                'signatures' => $logSignatures,
+            ],
+        ]);
     }
 
     public function approveTrip(Request $request, VehicleLog $vehicleLog): RedirectResponse

@@ -15,6 +15,7 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/logs/{vehicleLog}/modal-data', [DashboardController::class, 'logModalData'])->name('dashboard.logs.modal-data');
     Route::post('/trip-requests/{vehicleLog}/approve', [DashboardController::class, 'approveTrip'])->name('trips.approve');
     Route::post('/trip-requests/{vehicleLog}/reject', [DashboardController::class, 'rejectTrip'])->name('trips.reject');
 

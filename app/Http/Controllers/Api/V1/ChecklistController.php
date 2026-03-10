@@ -139,6 +139,7 @@ class ChecklistController extends Controller
             // 2. Validar items requeridos
             $requiredItems = $checklist->checklistItems()->where('required', true)->pluck('id');
             $submittedItemIds = collect($request->input('items'))->pluck('checklist_item_id');
+            $checklistItemIds = $checklist->checklistItems->pluck('id')->map(fn ($id) => (int) $id);
 
             $missingItems = $requiredItems->diff($submittedItemIds);
             if ($missingItems->isNotEmpty()) {
@@ -185,13 +186,22 @@ class ChecklistController extends Controller
                 if ($checklistItem && $checklistItem->type === 'signature') {
                     // Guardar en tabla signatures
                     if (isset($item['text_answer']) && !empty($item['text_answer'])) {
-                        Signature::create([
-                            'vehicle_log_id' => $log->id,
-                            'checklist_item_id' => $item['checklist_item_id'],
-                            'signature_data' => $item['text_answer'], // Base64 viene en text_answer
-                            'signer_name' => $request->input('signer_name') ?? $request->user()->name,
-                            'signed_at' => now(),
-                        ]);
+                        $signatureRaw = trim((string) $item['text_answer']);
+                        $signatureData = str_starts_with($signatureRaw, 'data:image')
+                            ? $signatureRaw
+                            : 'data:image/png;base64,' . preg_replace('/\s+/', '', $signatureRaw);
+
+                        Signature::updateOrCreate(
+                            [
+                                'vehicle_log_id' => $log->id,
+                                'checklist_item_id' => (int) $item['checklist_item_id'],
+                            ],
+                            [
+                                'signature_data' => $signatureData,
+                                'signer_name' => $request->input('signer_name') ?? $request->user()->name,
+                                'signed_at' => now(),
+                            ]
+                        );
                     }
                 } else {
                     // Guardar respuesta normal en vehicle_log_items
@@ -229,8 +239,8 @@ class ChecklistController extends Controller
                 if (strpos($key, 'item_photos_') === 0) {
                     $itemId = (int) str_replace('item_photos_', '', $key);
                     
-                    // Verificar que el item existe en las respuestas
-                    if (!$submittedItemIds->contains($itemId)) {
+                    // Verificar que el item pertenece al checklist enviado
+                    if (!$checklistItemIds->contains($itemId)) {
                         continue;
                     }
                     
@@ -251,7 +261,38 @@ class ChecklistController extends Controller
                 }
             }
 
-            // 7. Ya no se guarda firma global - se eliminó esta sección
+            // 7. Guardar firmas por item enviadas como item_signature_{id}
+            foreach ($request->all() as $key => $value) {
+                if (!preg_match('/^item_signature_(\d+)$/', $key, $matches)) {
+                    continue;
+                }
+
+                $itemId = (int) $matches[1];
+                if (!$checklistItemIds->contains($itemId)) {
+                    continue;
+                }
+
+                if (!is_string($value) || trim($value) === '') {
+                    continue;
+                }
+
+                $signatureRaw = trim($value);
+                $signatureData = str_starts_with($signatureRaw, 'data:image')
+                    ? $signatureRaw
+                    : 'data:image/png;base64,' . preg_replace('/\s+/', '', $signatureRaw);
+
+                Signature::updateOrCreate(
+                    [
+                        'vehicle_log_id' => $log->id,
+                        'checklist_item_id' => $itemId,
+                    ],
+                    [
+                        'signature_data' => $signatureData,
+                        'signer_name' => $request->input('signer_name') ?? $request->user()->name,
+                        'signed_at' => now(),
+                    ]
+                );
+            }
 
             // 8. Commit transaction
             DB::commit();

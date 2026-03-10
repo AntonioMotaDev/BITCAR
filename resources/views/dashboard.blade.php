@@ -7,7 +7,7 @@
         </div>
     </x-slot>
 
-    <div class="container-fluid py-4 px-4">
+    <div class="container-fluid py-0 px-4">
         <div class="row">
             <div class="col-lg-4">
                 <!-- Viajes en Curso -->
@@ -226,7 +226,12 @@
                             <h4 class="fw-bold mb-0">
                                 <i class="bi bi-map me-2"></i>Ubicacion de Unidades 
                             </h4>
-                            <span class="badge bg-success" id="activeTripsCount">0 activos</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <button type="button" class="btn btn-sm btn-outline-primary" id="refreshMapBtn">
+                                    <i class="bi bi-arrow-clockwise me-1"></i>Actualizar
+                                </button>
+                                <span class="badge bg-success" id="activeTripsCount">0 activos</span>
+                            </div>
                         </div>
                         <div id="map" style="width: 100%; height: 400px; border-radius: 8px; background-color: #f0f0f0;">
                             <div class="d-flex align-items-center justify-content-center h-100 text-muted">
@@ -302,12 +307,15 @@
                                                 </label>
                                                 <select class="form-select" id="logTypeSelect" name="log_type">
                                                     <option value="">Todos los tipos</option>
-                                                    <option value="mantenimiento" {{ request('log_type') == 'mantenimiento' ? 'selected' : '' }}>Mantenimiento</option>
-                                                    <option value="reparacion" {{ request('log_type') == 'reparacion' ? 'selected' : '' }}>Reparación</option>
-                                                    <option value="inspeccion" {{ request('log_type') == 'inspeccion' ? 'selected' : '' }}>Inspección</option>
-                                                    <option value="combustible" {{ request('log_type') == 'combustible' ? 'selected' : '' }}>Combustible</option>
-                                                    <option value="incidente" {{ request('log_type') == 'incidente' ? 'selected' : '' }}>Incidente</option>
-                                                    <option value="viaje" {{ request('log_type') == 'viaje' ? 'selected' : '' }}>Viaje</option>
+                                                    <option value="entry" {{ request('log_type') == 'entry' ? 'selected' : '' }}>Entrada</option>
+                                                    <option value="exit" {{ request('log_type') == 'exit' ? 'selected' : '' }}>Salida</option>
+                                                    <option value="trip_start" {{ request('log_type') == 'trip_start' ? 'selected' : '' }}>Inicio de viaje</option>
+                                                    <option value="trip_checkpoint" {{ request('log_type') == 'trip_checkpoint' ? 'selected' : '' }}>Checkpoint de viaje</option>
+                                                    <option value="trip_end" {{ request('log_type') == 'trip_end' ? 'selected' : '' }}>Fin de viaje</option>
+                                                    <option value="fuel" {{ request('log_type') == 'fuel' ? 'selected' : '' }}>Carga de combustible</option>
+                                                    <option value="incident" {{ request('log_type') == 'incident' ? 'selected' : '' }}>Incidencia</option>
+                                                    <option value="maintenance" {{ request('log_type') == 'maintenance' ? 'selected' : '' }}>Mantenimiento</option>
+                                                    <option value="other" {{ request('log_type') == 'other' ? 'selected' : '' }}>Otro</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -347,6 +355,20 @@
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            @php
+                                                $logTypeLabels = [
+                                                    'entrada' => 'Entrada',
+                                                    'salida' => 'Salida',
+                                                    'trip_start' => 'Inicio de viaje',
+                                                    'trip_end' => 'Fin de viaje',
+                                                    'trip_checkpoint' => 'Checkpoint de viaje',
+                                                    'fuel' => 'Carga de combustible',
+                                                    'incident' => 'Incidencia',
+                                                    'maintenance' => 'Mantenimiento',
+                                                    'exit' => 'Salida',
+                                                    'entry' => 'Entrada',
+                                                ];
+                                            @endphp
                                             @forelse($recentLogs as $log)
                                                 @php
                                                     // Agrupar fotos por checklist_item_id
@@ -381,6 +403,9 @@
 
                                                     $logSignatures = $log->signatures->map(function ($signature) {
                                                         return [
+                                                            'checklist_item_id' => $signature->checklist_item_id,
+                                                            'checklist_item' => $signature->checklistItem?->label,
+                                                            'signature_data' => $signature->signature_data,
                                                             'signer_name' => $signature->signer_name,
                                                             'signed_at' => optional($signature->signed_at)->format('d/m/Y H:i'),
                                                         ];
@@ -390,16 +415,18 @@
                                                     <td>{{ $log->created_at->format('d/m/Y H:i') }}</td>
                                                     <td>{{ $log->user->name }}</td>
                                                     <td>{{ $log->vehicle->brand }} {{ $log->vehicle->model }} ({{ $log->vehicle->license_plate }})</td>
-                                                    <td>{{ $log->type ?? 'N/A' }}</td>
+                                                    <td>{{ $logTypeLabels[$log->type] ?? \Illuminate\Support\Str::headline((string) $log->type) }}</td>
                                                     <td>{{ $log->notes ?? $log->description ?? '-' }}</td>
                                                     <td class="text-end">
                                                         <button type="button" class="btn btn-eye btn-sm view-log-answers"
                                                             data-bs-toggle="modal"
                                                             data-bs-target="#logAnswersModal"
                                                             data-log-id="{{ $log->id }}"
+                                                            data-log-endpoint="{{ route('dashboard.logs.modal-data', $log) }}"
                                                             data-log-date="{{ $log->created_at->format('d/m/Y H:i') }}"
                                                             data-log-user="{{ $log->user->name }}"
                                                             data-log-vehicle="{{ $log->vehicle->brand }} {{ $log->vehicle->model }} ({{ $log->vehicle->license_plate }})"
+                                                            data-log-detail="{{ $log->notes ?? $log->description ?? '-' }}"
                                                             data-log-items='@json($logItems)'
                                                             data-log-photos='@json($logPhotos)'
                                                             data-log-signatures='@json($logSignatures)'>
@@ -428,7 +455,7 @@
 
 <!-- Modal Respuestas de Bitácora -->
 <div class="modal fade" id="logAnswersModal" tabindex="-1" aria-labelledby="logAnswersModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="logAnswersModalLabel">
@@ -437,18 +464,40 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="mb-3 small text-muted">
-                    <div><strong>Fecha:</strong> <span id="logAnswersDate">-</span></div>
-                    <div><strong>Usuario:</strong> <span id="logAnswersUser">-</span></div>
-                    <div><strong>Vehículo:</strong> <span id="logAnswersVehicle">-</span></div>
+                <div class="card card-custom border-0 shadow-sm mb-3">
+                    <div class="card-body py-3">
+                        <div class="row g-3 small">
+                            <div class="col-md-4">
+                                <div class="text-muted text-uppercase fw-semibold">Fecha</div>
+                                <div class="fw-semibold text-prim" id="logAnswersDate">-</div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-muted text-uppercase fw-semibold">Usuario</div>
+                                <div class="fw-semibold text-prim" id="logAnswersUser">-</div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-muted text-uppercase fw-semibold">Vehiculo</div>
+                                <div class="fw-semibold text-prim" id="logAnswersVehicle">-</div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="text-muted text-uppercase fw-semibold">Detalle</div>
+                                <div class="fw-semibold text-prim" id="logAnswersDetail">-</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="table-responsive">
-                    <table class="table table-sm table-borderless">
-                        <thead class="bg-light">
+                <div class="card card-custom border-0 shadow-sm mb-3">
+                    <div class="card-body p-0">
+                        <div class="px-3 pt-3">
+                            <h6 class="fw-bold text-prim mb-3"><i class="bi bi-list-check me-2"></i>Respuestas</h6>
+                        </div>
+                        <div class="table-responsive">
+                    <table class="table table-sm align-middle mb-0">
+                        <thead class="table-light">
                             <tr>
-                                <th class="small fw-bold text-prim">Pregunta</th>
-                                <th class="small fw-bold text-prim">Respuesta</th>
+                                <th class="small fw-bold text-prim ps-3">Pregunta</th>
+                                <th class="small fw-bold text-prim pe-3">Respuesta</th>
                             </tr>
                         </thead>
                         <tbody id="logAnswersBody">
@@ -457,16 +506,22 @@
                             </tr>
                         </tbody>
                     </table>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="mt-4">
-                    <h6 class="fw-bold text-prim mb-2"><i class="bi bi-camera me-2"></i>Fotos</h6>
-                    <div id="logPhotos" class="small text-muted">Sin fotos</div>
-                </div>
+                {{-- <div class="card card-custom border-0 shadow-sm mb-3">
+                    <div class="card-body">
+                        <h6 class="fw-bold text-prim mb-3"><i class="bi bi-camera me-2"></i>Fotos</h6>
+                        <div id="logPhotos" class="small text-muted">Sin fotos</div>
+                    </div>
+                </div> --}}
 
-                <div class="mt-4">
-                    <h6 class="fw-bold text-prim mb-2"><i class="bi bi-pen me-2"></i>Firmas</h6>
-                    <div id="logSignatures" class="small text-muted">Sin firmas</div>
+                <div class="card card-custom border-0 shadow-sm">
+                    <div class="card-body">
+                        <h6 class="fw-bold text-prim mb-3"><i class="bi bi-pen me-2"></i>Firmas</h6>
+                        <div id="logSignatures" class="small text-muted">Sin firmas</div>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -478,68 +533,199 @@
     </div>
 </div>
 
+<div class="modal fade" id="logMediaPreviewModal" tabindex="-1" aria-labelledby="logMediaPreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="logMediaPreviewModalLabel">Vista previa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="logMediaPreviewImage" src="" alt="Vista previa" style="max-width: 100%; max-height: 70vh; border-radius: 10px;" />
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const logAnswersBody = document.getElementById('logAnswersBody');
     const logAnswersDate = document.getElementById('logAnswersDate');
     const logAnswersUser = document.getElementById('logAnswersUser');
     const logAnswersVehicle = document.getElementById('logAnswersVehicle');
+    const logAnswersDetail = document.getElementById('logAnswersDetail');
     const logPhotos = document.getElementById('logPhotos');
     const logSignatures = document.getElementById('logSignatures');
+    const logMediaPreviewModalEl = document.getElementById('logMediaPreviewModal');
+    const logMediaPreviewImage = document.getElementById('logMediaPreviewImage');
+    const logMediaPreviewModal = logMediaPreviewModalEl ? new bootstrap.Modal(logMediaPreviewModalEl) : null;
+
+    function safeParseJson(value, fallback = []) {
+        try {
+            return JSON.parse(value || '[]');
+        } catch (error) {
+            return fallback;
+        }
+    }
+
+    function resolveStorageUrl(path) {
+        if (!path) return '';
+        const rawValue = String(path).trim();
+        if (!rawValue) return '';
+
+        if (rawValue.startsWith('http://') || rawValue.startsWith('https://') || rawValue.startsWith('data:image')) {
+            return rawValue;
+        }
+
+        // Soporta firmas guardadas como base64 puro (sin prefijo data:image/...)
+        const normalizedBase64 = rawValue.replace(/\s+/g, '');
+        if (/^[A-Za-z0-9+/=]+$/.test(normalizedBase64) && normalizedBase64.length > 120) {
+            return `data:image/png;base64,${normalizedBase64}`;
+        }
+
+        const normalizedPath = rawValue.replace(/^\/+/, '');
+        return `/storage/${normalizedPath}`;
+    }
+
+    function renderThumbnailCard(url, title) {
+        return `
+            <button type="button" class="btn p-0 border-0 bg-transparent text-start log-media-preview" data-media-src="${url}" title="${title}">
+                <img src="${url}" alt="${title}" loading="lazy" decoding="async" class="img-thumbnail" style="width: 110px; height: 85px; object-fit: cover; border-radius: 10px;" />
+            </button>
+        `;
+    }
+
+    function escapeHtml(value) {
+        const div = document.createElement('div');
+        div.textContent = value ?? '';
+        return div.innerHTML;
+    }
+
+    function bindPreviewClicks() {
+        document.querySelectorAll('.log-media-preview').forEach(button => {
+            button.addEventListener('click', function () {
+                const mediaSrc = this.getAttribute('data-media-src');
+                if (!mediaSrc || !logMediaPreviewImage || !logMediaPreviewModal) {
+                    return;
+                }
+
+                logMediaPreviewImage.src = mediaSrc;
+                logMediaPreviewModal.show();
+            });
+        });
+    }
 
     document.querySelectorAll('.view-log-answers').forEach(button => {
-        button.addEventListener('click', function () {
-            const items = JSON.parse(this.getAttribute('data-log-items') || '[]');
-            const photos = JSON.parse(this.getAttribute('data-log-photos') || '[]');
-            const signatures = JSON.parse(this.getAttribute('data-log-signatures') || '[]');
+        button.addEventListener('click', async function () {
+            const endpoint = this.getAttribute('data-log-endpoint') || '';
+            let items = safeParseJson(this.getAttribute('data-log-items'));
+            let photos = safeParseJson(this.getAttribute('data-log-photos'));
+            let signatures = safeParseJson(this.getAttribute('data-log-signatures'));
             logAnswersDate.textContent = this.getAttribute('data-log-date') || '-';
             logAnswersUser.textContent = this.getAttribute('data-log-user') || '-';
             logAnswersVehicle.textContent = this.getAttribute('data-log-vehicle') || '-';
+            if (logAnswersDetail) {
+                logAnswersDetail.textContent = this.getAttribute('data-log-detail') || '-';
+            }
+
+            if (endpoint) {
+                try {
+                    const response = await fetch(endpoint, {
+                        headers: {
+                            'Accept': 'application/json',
+                        }
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        const data = result?.data || {};
+
+                        if (Array.isArray(data.items)) items = data.items;
+                        if (Array.isArray(data.photos)) photos = data.photos;
+                        if (Array.isArray(data.signatures)) signatures = data.signatures;
+                        if (logAnswersDetail && typeof data.detail === 'string') {
+                            logAnswersDetail.textContent = data.detail || '-';
+                        }
+                    }
+                } catch (error) {
+                    console.error('No se pudieron cargar los detalles de la bitacora:', error);
+                }
+            }
 
             if (!items.length) {
                 logAnswersBody.innerHTML = '<tr><td colspan="2" class="text-center text-muted py-4">Sin respuestas registradas</td></tr>';
-                return;
-            }
-
-            logAnswersBody.innerHTML = items.map(item => {
+            } else {
+                logAnswersBody.innerHTML = items.map(item => {
                 const answer = item.text_answer ?? (item.numeric_answer ?? (item.boolean_answer === null ? '-' : (item.boolean_answer ? 'Sí' : 'No')));
                 
                 // Renderizar fotos del item si existen
                 let photosHtml = '';
                 if (item.photos && item.photos.length > 0) {
-                    photosHtml = '<div class="mt-2">' + item.photos.map(photo => {
+                    photosHtml = '<div class="mt-2 d-flex flex-wrap gap-2">' + item.photos.map(photo => {
                         const desc = photo.description ? ` - ${photo.description}` : '';
-                        const url = photo.file_path ? `/storage/${photo.file_path}` : '#';
-                        return `<div class="small"><i class="bi bi-camera"></i> <a href="${url}" target="_blank" rel="noopener">Ver foto</a>${desc}</div>`;
+                        const url = resolveStorageUrl(photo.file_path);
+                        if (!url) return '';
+
+                        return `
+                            <div>
+                                ${renderThumbnailCard(url, '')}
+                                <div class="small text-muted mt-1">${escapeHtml(desc ? desc.replace(/^ - /, '') : '')}</div>
+                            </div>
+                        `;
                     }).join('') + '</div>';
                 }
                 
                 return `
                     <tr>
-                        <td class="small">${item.question ?? 'Pregunta'}</td>
-                        <td class="small">${answer ?? '-'}${photosHtml}</td>
+                        <td class="small ps-3">${escapeHtml(item.question ?? 'Pregunta')}</td>
+                        <td class="small pe-3">${escapeHtml(answer ?? '-')} ${photosHtml}</td>
                     </tr>
                 `;
             }).join('');
+            }
 
-            if (!photos.length) {
-                logPhotos.textContent = 'Sin fotos';
-            } else {
-                logPhotos.innerHTML = photos.map(photo => {
-                    const desc = photo.description ? ` - ${photo.description}` : '';
-                    const url = photo.file_path ? `/storage/${photo.file_path}` : '#';
-                    return `<div>• <a href="${url}" target="_blank" rel="noopener">Ver foto</a>${desc}</div>`;
-                }).join('');
+            if (logPhotos) {
+                if (!photos.length) {
+                    logPhotos.textContent = 'Sin fotos';
+                } else {
+                    logPhotos.innerHTML = `<div class="d-flex flex-wrap gap-3">${photos.map(photo => {
+                        const desc = photo.description ? ` - ${photo.description}` : '';
+                        const url = resolveStorageUrl(photo.file_path);
+                        if (!url) return '';
+
+                        return `
+                            <div>
+                                ${renderThumbnailCard(url, 'Foto de bitacora')}
+                                <div class="small text-muted mt-1">${escapeHtml(desc ? desc.replace(/^ - /, '') : 'Foto')}</div>
+                            </div>
+                        `;
+                    }).join('')}</div>`;
+                }
             }
 
             if (!signatures.length) {
                 logSignatures.textContent = 'Sin firmas';
             } else {
-                logSignatures.innerHTML = signatures.map(signature => {
+                logSignatures.innerHTML = `<div class="d-flex flex-wrap gap-3">${signatures.map(signature => {
                     const signedAt = signature.signed_at ? ` (${signature.signed_at})` : '';
-                    return `<div>• ${signature.signer_name ?? 'Firmante'}${signedAt}</div>`;
-                }).join('');
+                    const signerName = signature.signer_name ?? 'Firmante';
+                    const itemLabel = signature.checklist_item ? `${signature.checklist_item}` : 'Firma';
+                    const signatureUrl = resolveStorageUrl(signature.signature_data || '');
+                    if (!signatureUrl) {
+                        return `<div class="small text-muted">${escapeHtml(signerName)}${escapeHtml(signedAt)} - ${escapeHtml(itemLabel)}</div>`;
+                    }
+
+                    return `
+                        <div>
+                            ${renderThumbnailCard(signatureUrl, 'Firma')}
+                            <div class="small text-muted mt-1">${escapeHtml(itemLabel)}</div>
+                            <div class="small text-muted">${escapeHtml(signerName)}${escapeHtml(signedAt)}</div>
+                        </div>
+                    `;
+                }).join('')}</div>`;
             }
+
+            bindPreviewClicks();
         });
     });
 });
@@ -547,16 +733,17 @@ document.addEventListener('DOMContentLoaded', function () {
 // Google Maps - Tracking de Viajes Activos (Última ubicación)
 let map;
 const markers = new Map();
+const DEFAULT_CENTER = { lat: 22.1565, lng: -100.9855 }; // San Luis Potosi, Mexico
+const DEFAULT_ZOOM = 12;
+const MAX_AUTO_ZOOM = 16;
 
 async function initMap() {
     const mapElement = document.getElementById('map');
     
-    // Centro inicial (coordenadas de ejemplo, se ajustará según los viajes activos)
-    const initialCenter = { lat: 22.1565, lng: -100.9855 }; // Centro de San Luis Potosi, Mexico 
-    
     map = new google.maps.Map(mapElement, {
-        zoom: 12,
-        center: initialCenter,
+        zoom: DEFAULT_ZOOM,
+        center: DEFAULT_CENTER,
+        // mapTypeId: google.maps.MapTypeId.SATELLITE.
         mapTypeControl: true,
         fullscreenControl: true,
         streetViewControl: false,
@@ -564,16 +751,16 @@ async function initMap() {
             {
                 featureType: "poi",
                 elementType: "labels",
-                stylers: [{ visibility: "off" }]
+                stylers: [{ visibility: "on" }]
             }
         ]
     });
 
-    // Cargar ubicaciones activas (una sola vez)
-    loadActiveTrips();
+    // Carga inicial con ajuste de vista.
+    loadActiveTrips(true);
 }
 
-async function loadActiveTrips() {
+async function loadActiveTrips(shouldFitBounds = false) {
     try {
         const response = await fetch('/api/v1/tracking/active-trips', {
             headers: {
@@ -661,12 +848,19 @@ async function loadActiveTrips() {
             bounds.extend(position);
         });
 
-        // Ajustar vista del mapa
-        if (trips.length > 0) {
-            map.fitBounds(bounds); 
-        } else {
-            map.setCenter({ lat: 22.1565, lng: -100.9855 }); // centro de San Luis Potosi, Mexico
-            map.setZoom(12);
+        // Ajustar vista solo cuando se requiere (carga inicial).
+        if (trips.length > 0 && shouldFitBounds) {
+            map.fitBounds(bounds, 80);
+
+            // Evita que el ajuste automático deje el mapa demasiado cerca.
+            google.maps.event.addListenerOnce(map, 'bounds_changed', () => {
+                if (map.getZoom() > MAX_AUTO_ZOOM) {
+                    map.setZoom(MAX_AUTO_ZOOM);
+                }
+            });
+        } else if (trips.length === 0) {
+            map.setCenter(DEFAULT_CENTER);
+            map.setZoom(DEFAULT_ZOOM);
         }
 
     } catch (error) {
@@ -676,12 +870,23 @@ async function loadActiveTrips() {
 
 // Inicializar mapa cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', function() {
+    const refreshMapBtn = document.getElementById('refreshMapBtn');
+
+    refreshMapBtn?.addEventListener('click', async function() {
+        refreshMapBtn.disabled = true;
+        refreshMapBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Actualizando';
+
+        try {
+            await loadActiveTrips(false);
+        } finally {
+            refreshMapBtn.disabled = false;
+            refreshMapBtn.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i>Actualizar';
+        }
+    });
+
     // Esperar a que Google Maps esté cargado
     if (typeof google !== 'undefined' && google.maps) {
         initMap();
-        
-        // Auto-actualizar ubicaciones cada 10 segundos
-        setInterval(loadActiveTrips, 10000);
     } else {
         console.error('Google Maps API no está cargada');
     }
